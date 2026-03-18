@@ -4,3 +4,9 @@ export interface CompanyDto {
 	careersUrl?: string;
 	active: boolean;
 }
+
+export interface CreateCompanyRequest {
+	name: string;
+	careersUrl?: string;
+	active?: boolean;
+}

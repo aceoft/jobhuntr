@@ -1,9 +1,20 @@
+import type { Request, Response, NextFunction } from 'express';
+import type { CreateCompanyRequest } from 'jobhuntr-shared';
 import * as companyService from '../services/companyService';
 
-export async function getCompanies(req, res, next) {
+export async function getCompanies(req: Request, res: Response, next: NextFunction) {
 	try {
 		const companies = await companyService.getAllCompanies();
 		res.json(companies);
+	} catch (err) {
+		next(err);
+	}
+}
+
+export async function createCompany(req: Request<{}, {}, CreateCompanyRequest>, res: Response, next: NextFunction) {
+	try {
+		const company = await companyService.createCompany(req.body);
+		res.status(201).json(company);
 	} catch (err) {
 		next(err);
 	}
