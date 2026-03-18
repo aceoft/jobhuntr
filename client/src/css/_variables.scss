@@ -1,0 +1,49 @@
+// Standard breakpoints from uno
+$bp-sm: 640px;
+$bp-md: 768px;
+$bp-lg: 1024px;
+$bp-xl: 1280px;
+$bp-2xl: 1536px;
+
+// Create a map for the mixins to use
+$grid-breakpoints: (
+	xs: 0,
+	sm: $bp-sm,
+	md: $bp-md,
+	lg: $bp-lg,
+	xl: $bp-xl,
+	2xl: $bp-2xl,
+);
+
+// Define palette first
+$colorBg: #0f162c;
+$colorBgDark: #08090a;
+$colorSurface: #111a3370;
+$colorElevated: #17214a;
+$colorText: #e5e7eb;
+$colorMuted: #9aa4b2;
+$colorBorder: #60a5fa22;
+$colorBorderFull: #60a5fa;
+$colorAccent: #60a5fa;
+$colorDanger: #f87171;
+
+// Create a map for easy traversal
+$colors: (
+	bg: $colorBg,
+	bg-dark: $colorBgDark,
+	surface: $colorSurface,
+	elevated: $colorElevated,
+	text: $colorText,
+	muted: $colorMuted,
+	border: $colorBorder,
+	border-full: $colorBorderFull,
+	accent: $colorAccent,
+	danger: $colorDanger,
+);
+
+// Export as css variables
+:root {
+	@each $name, $value in $colors {
+		--color-#{$name}: #{$value};
+	}
+}

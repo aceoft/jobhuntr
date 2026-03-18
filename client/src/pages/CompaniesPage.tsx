@@ -17,7 +17,7 @@ export default function CompaniesPage() {
 					<li key={c._id}>
 						<strong>{c.name}</strong>{' '}
 						{c.careersUrl && (
-							<a href={c.careersUrl} target="_blank">
+							<a href={c.careersUrl} target="_blank" className="text-link">
 								careers
 							</a>
 						)}

@@ -1,0 +1,6 @@
+.card {
+	backdrop-filter: blur(2px);
+
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+}

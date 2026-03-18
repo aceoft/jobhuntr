@@ -1,0 +1,24 @@
+@use 'sass:map';
+@use 'variables' as *;
+
+// Minimum breakpoint width. Null for the smallest (first) breakpoint.
+@function breakpoint-min($name, $breakpoints: variables.$grid-breakpoints) {
+	$min: map.get($breakpoints, $name);
+
+	@if $min != 0 {
+		@return $min;
+	}
+
+	@return null;
+}
+
+@mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
+	$min: breakpoint-min($name, $breakpoints);
+	@if $min {
+		@media (min-width: $min) {
+			@content;
+		}
+	} @else {
+		@content;
+	}
+}
