@@ -19,3 +19,15 @@ export async function createCompany(req: Request<{}, {}, CreateCompanyRequest>, 
 		next(err);
 	}
 }
+
+export async function getCompanyById(req: Request, res: Response, next: NextFunction) {
+	try {
+		const company = await companyService.getCompanyById(req.params.id, { includeInactive: false });
+		if (!company) {
+			return res.status(404).json({ message: 'Company not found' });
+		}
+		res.json(company);
+	} catch (err) {
+		next(err);
+	}
+}
