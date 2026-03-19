@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { CompanyDto } from 'jobhuntr-shared';
 import { createCompany, getCompanies } from '../api/companiesApi';
 import AppButton from '../components/AppButton';
@@ -58,7 +59,11 @@ export default function CompaniesPage() {
 			<ul>
 				{companies.map((c) => (
 					<li key={c._id}>
-						<strong>{c.name}</strong>{' '}
+						<strong>
+							<Link to={`/companies/${c._id}`} className="text-link">
+								{c.name}
+							</Link>
+						</strong>{' '}
 						{c.careersUrl && (
 							<a href={c.careersUrl} target="_blank" rel="noreferrer noopener">
 								careers
