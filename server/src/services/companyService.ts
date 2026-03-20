@@ -1,13 +1,15 @@
 import mongoose from 'mongoose';
-import Company from '../models/Company';
-import type { CompanyDto, CreateCompanyRequest } from 'jobhuntr-shared';
+import { Company, CompanyDocument } from '../models/Company';
+import { optionalString, type CompanyDto, type CreateCompanyRequest } from 'jobhuntr-shared';
+import { toOutreachPersonDto } from './outreachMapper';
 
-function toCompanyDto(doc: any): CompanyDto {
+function toCompanyDto(doc: CompanyDocument): CompanyDto {
 	return {
 		_id: doc._id.toString(),
 		name: doc.name,
-		careersUrl: doc.careersUrl,
+		careersUrl: optionalString(doc.careersUrl),
 		active: doc.active,
+		outreach: doc.outreach.map((o) => toOutreachPersonDto(o)),
 	};
 }
 

@@ -1,4 +1,5 @@
 import { Note } from './Note';
+import { OutreachPerson } from './Outreach';
 
 export const ApplicationStatusValues = [
 	'saved',
@@ -24,20 +25,6 @@ export type ApplicationStatusChange = {
 	status: ApplicationStatus;
 	at: Date;
 	note?: string;
-};
-
-export type OutreachEvent = {
-	text?: string;
-	isResponse: boolean;
-	at: Date;
-};
-
-export type OutreachPerson = {
-	name: string;
-	url?: string;
-	role?: string;
-	email?: string;
-	events: OutreachEvent[];
 };
 
 export type ApplicationDto = {

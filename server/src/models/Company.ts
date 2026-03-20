@@ -1,9 +1,14 @@
-import mongoose from 'mongoose';
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
+import { outreachPersonSchema } from './outreachPersonSchema';
 
-const companySchema = new mongoose.Schema(
+const companySchema = new Schema(
 	{
 		name: { type: String, required: true },
 		careersUrl: String,
+		outreach: {
+			type: [outreachPersonSchema],
+			default: [],
+		},
 		active: { type: Boolean, default: true },
 	},
 	{
@@ -11,6 +16,5 @@ const companySchema = new mongoose.Schema(
 	},
 );
 
-const Company = mongoose.model('Company', companySchema);
-
-export default Company;
+export type CompanyDocument = HydratedDocument<InferSchemaType<typeof companySchema>>;
+export const Company = model('Company', companySchema);
