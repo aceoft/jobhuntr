@@ -120,7 +120,7 @@ export default function CompanyDetailsPage() {
 			<h2>Outreach</h2>
 
 			{company.outreach.map((p) => (
-				<div className="card flex! items-center gap-2" key={p.id}>
+				<div className="card flex items-center gap-2" key={p.id}>
 					{p.url ? (
 						<a href={p.url} className="text-link">
 							{p.name}
