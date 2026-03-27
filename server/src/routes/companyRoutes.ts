@@ -1,10 +1,18 @@
 import { Router } from 'express';
-import { getCompanies, createCompany, getCompanyById } from '../controllers/companyController';
+import {
+	getCompanies,
+	createCompany,
+	getCompanyById,
+	addCompanyOutreachPerson,
+	removeCompanyOutreachPerson,
+} from '../controllers/companyController';
 
 const router = Router();
 
 router.get('/', getCompanies);
 router.get('/:id', getCompanyById);
 router.post('/', createCompany);
+router.post('/:companyId/outreach', addCompanyOutreachPerson);
+router.delete('/:companyId/outreach/:personId', removeCompanyOutreachPerson);
 
 export default router;

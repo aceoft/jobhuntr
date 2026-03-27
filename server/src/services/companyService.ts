@@ -52,7 +52,7 @@ export async function createCompany(input: CreateCompanyRequest): Promise<Compan
 export async function addCompanyOutreachPerson(
 	companyId: string,
 	dto: AddOutreachPersonRequest,
-): Promise<OutreachPerson> {
+): Promise<OutreachPerson | null> {
 	const person: OutreachPerson = {
 		id: randomUUID(),
 		name: dto.name,
@@ -70,11 +70,12 @@ export async function addCompanyOutreachPerson(
 				]
 			: [],
 	};
-	await Company.findByIdAndUpdate(companyId, {
+	const company = await Company.findByIdAndUpdate(companyId, {
 		$push: {
 			outreach: person,
 		},
 	});
+	if (!company) return null;
 	return person;
 }
 
@@ -82,14 +83,14 @@ export async function addCompanyOutreachPersonEvent(
 	companyId: string,
 	personId: string,
 	dto: OutreachEvent,
-): Promise<OutreachEvent> {
+): Promise<OutreachEvent | null> {
 	const event: OutreachEvent = {
 		id: randomUUID(),
 		at: new Date(),
 		isResponse: dto.isResponse,
 		text: dto.text,
 	};
-	const result = await Company.findOneAndUpdate(
+	const result = await Company.updateOne(
 		{ _id: companyId, 'outreach.id': personId },
 		{
 			$push: {
@@ -97,5 +98,25 @@ export async function addCompanyOutreachPersonEvent(
 			},
 		},
 	);
+	if (result.matchedCount === 0) return null;
 	return event;
+}
+
+export async function removeCompanyOutreachPerson(companyId: string, personId: string): Promise<undefined> {
+	const result = await Company.updateOne(
+		{ _id: companyId },
+		{
+			$pull: {
+				outreach: { id: personId },
+			},
+		},
+	);
+
+	if (result.matchedCount === 0) {
+		throw new Error('Company not found.');
+	}
+
+	if (result.modifiedCount === 0) {
+		throw new Error('Outreach person not found.');
+	}
 }

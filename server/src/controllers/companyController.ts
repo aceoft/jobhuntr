@@ -31,3 +31,24 @@ export async function getCompanyById(req: Request, res: Response, next: NextFunc
 		next(err);
 	}
 }
+
+export async function addCompanyOutreachPerson(req: Request, res: Response, next: NextFunction) {
+	try {
+		const person = await companyService.addCompanyOutreachPerson(req.params.companyId, req.body);
+		if (!person) {
+			return res.status(404).json({ message: 'Company not found' });
+		}
+		res.json(person);
+	} catch (err) {
+		next(err);
+	}
+}
+
+export async function removeCompanyOutreachPerson(req: Request, res: Response, next: NextFunction) {
+	try {
+		await companyService.removeCompanyOutreachPerson(req.params.companyId, req.params.personId);
+		res.status(204).send();
+	} catch (err) {
+		next(err);
+	}
+}

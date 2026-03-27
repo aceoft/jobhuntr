@@ -50,10 +50,6 @@ export default defineConfig({
 		// ---- cards ----
 		card: 'bg-surface/30 rounded-2xl p-6 md:p-7 border border-border border-solid border-1',
 		'card-hover': 'transition hover:bg-surface/50 hover:border-border-full/30 hover:-translate-y-0.5',
-		'card-title': 'text-xl font-semibold tracking-tight',
-		'card-body': 'text-muted leading-relaxed',
-		'card-cta':
-			'text-accent font-medium inline-flex items-center gap-2 group-hover:underline underline-offset-4 transition hover:text-white',
 
 		// ---- buttons ----
 		btn: 'inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md font-bold transition focus-ring disabled:opacity-50 disabled:pointer-events-none active:translate-x-[1px] active:translate-y-[1px]',

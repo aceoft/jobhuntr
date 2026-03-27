@@ -26,7 +26,9 @@ export default function CompaniesPage() {
 
 	return (
 		<div>
-			<h1>Companies</h1>
+			<h1>
+				<Link to="/">JobHuntr</Link> » Companies
+			</h1>
 
 			<form>
 				<div className="my-4">

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { CompanyDto } from 'jobhuntr-shared';
-import { getCompanyById } from '../api/companiesApi';
+import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
 import AppButton from '../components/AppButton';
 
 export default function CompanyDetailsPage() {
@@ -10,6 +10,10 @@ export default function CompanyDetailsPage() {
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [newPersonName, setNewPersonName] = useState('');
+	const [newPersonEmail, setNewPersonEmail] = useState('');
+	const [newPersonRole, setNewPersonRole] = useState('');
+	const [newPersonUrl, setNewPersonUrl] = useState('');
 
 	useEffect(() => {
 		async function loadCompany() {
@@ -45,13 +49,53 @@ export default function CompanyDetailsPage() {
 		return <div>Company not found.</div>;
 	}
 
+	async function addPerson() {
+		if (!company) {
+			setError('No company, cannot add person.');
+			return;
+		}
+		const created = await addCompanyOutreachPerson(company._id, {
+			name: newPersonName,
+			email: newPersonEmail,
+			role: newPersonRole,
+			url: newPersonUrl,
+		});
+		setNewPersonName('');
+		setNewPersonEmail('');
+		setNewPersonRole('');
+		setNewPersonUrl('');
+		setCompany((current) => {
+			if (!current) return current;
+
+			return {
+				...current,
+				outreach: [...current.outreach, created],
+			};
+		});
+	}
+
+	async function removePerson(id: string) {
+		if (!company) {
+			setError('No company, cannot add person.');
+			return;
+		}
+		if (!id) return;
+		await removeCompanyOutreachPerson(company._id, id);
+		setCompany((current) => {
+			if (!current) return current;
+
+			return {
+				...current,
+				outreach: [...current.outreach.filter((p) => p.id !== id)],
+			};
+		});
+	}
+
 	return (
 		<div>
-			<div className="my-4">
-				<Link to="/companies">← Back to Companies</Link>
-			</div>
-
-			<h1>{company.name}</h1>
+			<h1>
+				<Link to="/">JobHuntr</Link> » <Link to="/companies">Companies</Link> » {company.name}
+			</h1>
 
 			<div className="my-4">
 				<label className="label">Company Name</label>
@@ -71,9 +115,76 @@ export default function CompanyDetailsPage() {
 				</div>
 			</div>
 
-			{/* <div className="my-4">
-				<AppButton variant="primary">Edit Company</AppButton>
-			</div> */}
+			<h2>Outreach</h2>
+
+			{company.outreach.map((p) => (
+				<div className="card flex! items-center gap-2" key={p.id}>
+					{p.url ? (
+						<a href={p.url} className="text-link">
+							{p.name}
+						</a>
+					) : (
+						p.name
+					)}
+					{p.role && <span>({p.role})</span>}
+					{p.email}
+					<AppButton variant="ghost" className="ml-auto" onClick={() => removePerson(p.id)} aria-label="remove">
+						🗑️
+					</AppButton>
+				</div>
+			))}
+
+			<h2>Add New Outreach</h2>
+			<form>
+				<div className="my-4">
+					<label className="label" htmlFor="person-name">
+						Name
+					</label>
+					<input
+						className="input"
+						id="person-name"
+						value={newPersonName}
+						onChange={(e) => setNewPersonName(e.target.value)}
+					/>
+				</div>
+				<div className="my-4">
+					<label className="label" htmlFor="person-email">
+						Email
+					</label>
+					<input
+						className="input"
+						id="person-email"
+						value={newPersonEmail}
+						onChange={(e) => setNewPersonEmail(e.target.value)}
+					/>
+				</div>
+				<div className="my-4">
+					<label className="label" htmlFor="person-role">
+						Role
+					</label>
+					<input
+						className="input"
+						id="person-role"
+						value={newPersonRole}
+						onChange={(e) => setNewPersonRole(e.target.value)}
+					/>
+				</div>
+				<div className="my-4">
+					<label className="label" htmlFor="person-url">
+						Url
+					</label>
+					<input
+						className="input"
+						id="person-url"
+						value={newPersonUrl}
+						onChange={(e) => setNewPersonUrl(e.target.value)}
+					/>
+				</div>
+
+				<div className="my-4">
+					<AppButton onClick={addPerson}>Add Outreach Person</AppButton>
+				</div>
+			</form>
 		</div>
 	);
 }
