@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import type { AddOutreachPersonRequest, CompanyDto } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
 import AppButton from '../components/AppButton';
+import AppInput from '../components/AppInput';
 
 export default function CompanyDetailsPage() {
 	const { id } = useParams<{ id: string }>();
@@ -137,50 +138,10 @@ export default function CompanyDetailsPage() {
 
 			<h2>Add New Outreach</h2>
 			<form>
-				<div className="my-4">
-					<label className="label" htmlFor="person-name">
-						Name
-					</label>
-					<input
-						className="input"
-						id="person-name"
-						value={newPerson.name}
-						onChange={(e) => updateNewPerson('name', e.target.value)}
-					/>
-				</div>
-				<div className="my-4">
-					<label className="label" htmlFor="person-email">
-						Email
-					</label>
-					<input
-						className="input"
-						id="person-email"
-						value={newPerson.email}
-						onChange={(e) => updateNewPerson('email', e.target.value)}
-					/>
-				</div>
-				<div className="my-4">
-					<label className="label" htmlFor="person-role">
-						Role
-					</label>
-					<input
-						className="input"
-						id="person-role"
-						value={newPerson.role}
-						onChange={(e) => updateNewPerson('role', e.target.value)}
-					/>
-				</div>
-				<div className="my-4">
-					<label className="label" htmlFor="person-url">
-						Url
-					</label>
-					<input
-						className="input"
-						id="person-url"
-						value={newPerson.url}
-						onChange={(e) => updateNewPerson('url', e.target.value)}
-					/>
-				</div>
+				<AppInput label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
+				<AppInput label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
+				<AppInput label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
+				<AppInput label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
 
 				<div className="my-4">
 					<AppButton onClick={addPerson}>Add Outreach Person</AppButton>
