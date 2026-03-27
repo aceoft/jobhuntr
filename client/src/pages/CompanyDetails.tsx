@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { CompanyDto } from 'jobhuntr-shared';
+import type { AddOutreachPersonRequest, CompanyDto } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
 import AppButton from '../components/AppButton';
 
@@ -10,10 +10,17 @@ export default function CompanyDetailsPage() {
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
-	const [newPersonName, setNewPersonName] = useState('');
-	const [newPersonEmail, setNewPersonEmail] = useState('');
-	const [newPersonRole, setNewPersonRole] = useState('');
-	const [newPersonUrl, setNewPersonUrl] = useState('');
+
+	const emptyPerson: AddOutreachPersonRequest = {
+		name: '',
+		email: '',
+		role: '',
+		url: '',
+	};
+	const [newPerson, setNewPerson] = useState(emptyPerson);
+	function updateNewPerson<K extends keyof typeof newPerson>(key: K, value: (typeof newPerson)[K]) {
+		setNewPerson((p) => ({ ...p, [key]: value }));
+	}
 
 	useEffect(() => {
 		async function loadCompany() {
@@ -54,16 +61,10 @@ export default function CompanyDetailsPage() {
 			setError('No company, cannot add person.');
 			return;
 		}
-		const created = await addCompanyOutreachPerson(company._id, {
-			name: newPersonName,
-			email: newPersonEmail,
-			role: newPersonRole,
-			url: newPersonUrl,
-		});
-		setNewPersonName('');
-		setNewPersonEmail('');
-		setNewPersonRole('');
-		setNewPersonUrl('');
+
+		const created = await addCompanyOutreachPerson(company._id, newPerson);
+		setNewPerson(emptyPerson);
+
 		setCompany((current) => {
 			if (!current) return current;
 
@@ -143,8 +144,8 @@ export default function CompanyDetailsPage() {
 					<input
 						className="input"
 						id="person-name"
-						value={newPersonName}
-						onChange={(e) => setNewPersonName(e.target.value)}
+						value={newPerson.name}
+						onChange={(e) => updateNewPerson('name', e.target.value)}
 					/>
 				</div>
 				<div className="my-4">
@@ -154,8 +155,8 @@ export default function CompanyDetailsPage() {
 					<input
 						className="input"
 						id="person-email"
-						value={newPersonEmail}
-						onChange={(e) => setNewPersonEmail(e.target.value)}
+						value={newPerson.email}
+						onChange={(e) => updateNewPerson('email', e.target.value)}
 					/>
 				</div>
 				<div className="my-4">
@@ -165,8 +166,8 @@ export default function CompanyDetailsPage() {
 					<input
 						className="input"
 						id="person-role"
-						value={newPersonRole}
-						onChange={(e) => setNewPersonRole(e.target.value)}
+						value={newPerson.role}
+						onChange={(e) => updateNewPerson('role', e.target.value)}
 					/>
 				</div>
 				<div className="my-4">
@@ -176,8 +177,8 @@ export default function CompanyDetailsPage() {
 					<input
 						className="input"
 						id="person-url"
-						value={newPersonUrl}
-						onChange={(e) => setNewPersonUrl(e.target.value)}
+						value={newPerson.url}
+						onChange={(e) => updateNewPerson('url', e.target.value)}
 					/>
 				</div>
 
