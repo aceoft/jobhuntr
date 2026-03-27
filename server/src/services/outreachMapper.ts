@@ -7,6 +7,7 @@ type OutreachEventDb = InferSchemaType<typeof outreachEventSchema>;
 
 export function toOutreachPersonDto(person: OutreachPersonDb): OutreachPerson {
 	return {
+		id: person.id,
 		name: person.name,
 		email: optionalString(person.email),
 		role: optionalString(person.role),
@@ -17,6 +18,7 @@ export function toOutreachPersonDto(person: OutreachPersonDb): OutreachPerson {
 
 function toOutreachEvent(event: OutreachEventDb): OutreachEvent {
 	return {
+		id: event.id,
 		at: event.at,
 		isResponse: event.isResponse,
 		text: optionalString(event.text),

@@ -21,20 +21,17 @@ const applicationStatusChangeSchema = new Schema(
 	{ _id: false },
 );
 
-const noteSchema = new Schema(
-	{
-		text: {
-			type: String,
-			required: true,
-			trim: true,
-		},
-		at: {
-			type: Date,
-			required: true,
-		},
+const noteSchema = new Schema({
+	text: {
+		type: String,
+		required: true,
+		trim: true,
 	},
-	{ _id: false },
-);
+	at: {
+		type: Date,
+		required: true,
+	},
+});
 
 const applicationSchema = new Schema(
 	{

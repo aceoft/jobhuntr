@@ -2,6 +2,10 @@ import { Schema } from 'mongoose';
 
 export const outreachEventSchema = new Schema(
 	{
+		id: {
+			type: String,
+			required: true,
+		},
 		text: {
 			type: String,
 			trim: true,
@@ -20,6 +24,10 @@ export const outreachEventSchema = new Schema(
 
 export const outreachPersonSchema = new Schema(
 	{
+		id: {
+			type: String,
+			required: true,
+		},
 		name: {
 			type: String,
 			required: true,
