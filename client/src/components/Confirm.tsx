@@ -5,7 +5,7 @@ type ConfirmProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	message: string;
-	onConfirm: () => void;
+	onConfirm: () => void | Promise<void>;
 	confirmText?: string;
 	cancelText?: string;
 };
@@ -22,8 +22,8 @@ export default function Confirm({
 		onOpenChange(false);
 	}
 
-	function handleConfirm() {
-		onConfirm();
+	async function handleConfirm() {
+		await onConfirm();
 		onOpenChange(false);
 	}
 
