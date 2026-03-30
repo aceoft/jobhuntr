@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { AddOutreachPersonRequest, CompanyDto } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
-import AppButton from '../components/AppButton';
-import AppInput from '../components/AppInput';
+import Button from '../components/Button';
+import Input from '../components/Input';
 
-export default function CompanyDetailsPage() {
+export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
 
 	const [company, setCompany] = useState<CompanyDto | null>(null);
@@ -130,21 +130,21 @@ export default function CompanyDetailsPage() {
 					)}
 					{p.role && <span>({p.role})</span>}
 					{p.email}
-					<AppButton variant="ghost" className="ml-auto" onClick={() => removePerson(p.id)} aria-label="remove">
+					<Button variant="ghost" className="ml-auto" onClick={() => removePerson(p.id)} aria-label="remove">
 						🗑️
-					</AppButton>
+					</Button>
 				</div>
 			))}
 
 			<h2>Add New Outreach</h2>
 			<form>
-				<AppInput label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
-				<AppInput label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
-				<AppInput label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
-				<AppInput label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
+				<Input label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
+				<Input label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
+				<Input label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
+				<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
 
 				<div className="my-4">
-					<AppButton onClick={addPerson}>Add Outreach Person</AppButton>
+					<Button onClick={addPerson}>Add Outreach Person</Button>
 				</div>
 			</form>
 		</div>

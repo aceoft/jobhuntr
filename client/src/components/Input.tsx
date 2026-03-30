@@ -1,12 +1,12 @@
 import { useId } from 'react';
 
-type AppInputProps = {
+type InputProps = {
 	label: string;
 	className?: string;
 	onChange: (value: string) => void;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>;
 
-export default function AppInput({ label, id, className, value, onChange, ...rest }: AppInputProps) {
+export default function Input({ label, id, className, value, onChange, ...rest }: InputProps) {
 	const combinedClassName = ['input', className].filter(Boolean).join(' ');
 	const inputId = id ?? useId();
 

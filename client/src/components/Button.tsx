@@ -1,18 +1,18 @@
 import React from 'react';
 //import { useEventTracking } from '../../core/ts/analytics';
 
-type AppButtonVariant = 'primary' | 'ghost';
-type AppButtonSize = 'md' | 'lg';
+type ButtonVariant = 'primary' | 'ghost';
+type ButtonSize = 'md' | 'lg';
 
-interface AppButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: AppButtonVariant;
-	size?: AppButtonSize;
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+	variant?: ButtonVariant;
+	size?: ButtonSize;
 	event?: string;
 }
 
 //const eventTracking = useEventTracking();
 
-const AppButton = React.forwardRef<HTMLButtonElement, AppButtonProps>(
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 	({ children, type = 'button', variant = 'primary', size = 'md', event, className, ...rest }, ref) => {
 		const combinedClassName = [`btn-${variant}`, `btn-${size}`, className].filter(Boolean).join(' ');
 
@@ -26,4 +26,4 @@ const AppButton = React.forwardRef<HTMLButtonElement, AppButtonProps>(
 	},
 );
 
-export default AppButton;
+export default Button;

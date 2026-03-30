@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { CompanyDto } from 'jobhuntr-shared';
 import { createCompany, getCompanies } from '../api/companiesApi';
-import AppButton from '../components/AppButton';
+import Button from '../components/Button';
 
-export default function CompaniesPage() {
+export default function Companies() {
 	const [companies, setCompanies] = useState<CompanyDto[]>([]);
 	const [name, setName] = useState('');
 	const [careersUrl, setCareersUrl] = useState('');
@@ -51,9 +51,9 @@ export default function CompaniesPage() {
 				</div>
 
 				<div className="my-4">
-					<AppButton variant="primary" onClick={addCompany}>
+					<Button variant="primary" onClick={addCompany}>
 						Add Company
-					</AppButton>
+					</Button>
 				</div>
 			</form>
 
