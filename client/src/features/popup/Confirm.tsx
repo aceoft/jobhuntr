@@ -1,5 +1,5 @@
 import { Popup } from './Popup';
-import Button from './Button';
+import Button from '../../components/Button';
 
 type ConfirmProps = {
 	open: boolean;

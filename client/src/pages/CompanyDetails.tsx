@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { AddOutreachPersonRequest, CompanyDto } from 'jobhuntr-shared';
+import type { AddOutreachPersonRequest, CompanyDto, OutreachPerson } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
+import { usePopup } from '../features/popup/usePopup';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import Confirm from '../components/Confirm';
-import Alert from '../components/Alert';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
+	const { alert, confirm } = usePopup();
 
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
-	const [confirmingRemovePersonId, setConfirmingRemovePersonId] = useState<string | null>(null);
-	const [confirmingRemovePerson, setConfirmingRemovePerson] = useState<boolean>(false);
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -63,7 +61,7 @@ export default function CompanyDetails() {
 
 	async function addPerson() {
 		if (!company) {
-			setError('No company, cannot add person.');
+			alert({ message: 'No company, cannot add person.' });
 			return;
 		}
 
@@ -80,25 +78,21 @@ export default function CompanyDetails() {
 		});
 	}
 
-	function beginRemovePerson(id: string) {
+	async function removePerson(person: OutreachPerson) {
+		if (!person) return;
 		if (!company) {
-			setError('No company, cannot add person.');
+			alert({ message: 'No company, cannot remove person.' });
 			return;
 		}
-		if (!id) return;
-		setConfirmingRemovePersonId(id);
-		setConfirmingRemovePerson(true);
-	}
+		if (!(await confirm({ message: `Are you sure you want to remove ${person.name}?` }))) return;
 
-	async function removePerson() {
-		if (!confirmingRemovePersonId) return;
-		await removeCompanyOutreachPerson(company!._id, confirmingRemovePersonId);
+		await removeCompanyOutreachPerson(company!._id, person.id);
 		setCompany((current) => {
 			if (!current) return current;
 
 			return {
 				...current,
-				outreach: [...current.outreach.filter((p) => p.id !== confirmingRemovePersonId)],
+				outreach: [...current.outreach.filter((p) => p.id !== person.id)],
 			};
 		});
 	}
@@ -140,22 +134,11 @@ export default function CompanyDetails() {
 					)}
 					{p.role && <span>({p.role})</span>}
 					{p.email}
-					<Button variant="ghost" className="ml-auto" onClick={() => beginRemovePerson(p.id)} aria-label="remove">
+					<Button variant="ghost" className="ml-auto" onClick={() => removePerson(p)} aria-label="remove">
 						🗑️
 					</Button>
 				</div>
 			))}
-
-			<Confirm
-				message="Are you sure you want to remove this outreach person?"
-				open={confirmingRemovePerson}
-				onOpenChange={setConfirmingRemovePerson}
-				onConfirm={removePerson}
-			/>
-
-			<Alert message="Person removed successfully." okText="Got it" open={false} onOpenChange={() => {}}>
-				<p>Here is some content inside the alert.</p>
-			</Alert>
 
 			<h2>Add New Outreach</h2>
 			<form>
