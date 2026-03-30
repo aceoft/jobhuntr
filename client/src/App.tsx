@@ -9,7 +9,7 @@ export default function App() {
 		<PopupProvider>
 			<BrowserRouter>
 				<Routes>
-					{<Route path="/" element={<Home />} />}
+					<Route path="/" element={<Home />} />
 					<Route path="/companies" element={<Companies />} />
 					<Route path="/companies/:id" element={<CompanyDetails />} />
 				</Routes>
