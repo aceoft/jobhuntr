@@ -148,8 +148,8 @@ export default function CompanyDetails() {
 			<Confirm
 				message="Are you sure you want to remove this outreach person?"
 				open={confirmingRemovePerson}
-				onConfirm={() => removePerson()}
-				close={() => setConfirmingRemovePerson(false)}
+				onOpenChange={setConfirmingRemovePerson}
+				onConfirm={removePerson}
 			/>
 
 			<h2>Add New Outreach</h2>
