@@ -5,6 +5,7 @@ import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson }
 import Button from '../components/Button';
 import Input from '../components/Input';
 import Confirm from '../components/Confirm';
+import Alert from '../components/Alert';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -151,6 +152,10 @@ export default function CompanyDetails() {
 				onOpenChange={setConfirmingRemovePerson}
 				onConfirm={removePerson}
 			/>
+
+			<Alert message="Person removed successfully." okText="Got it" open={false} onOpenChange={() => {}}>
+				<p>Here is some content inside the alert.</p>
+			</Alert>
 
 			<h2>Add New Outreach</h2>
 			<form>

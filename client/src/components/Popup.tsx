@@ -12,7 +12,10 @@ export function Popup({ open, onOpenChange, children }: PopupProps) {
 	return createPortal(
 		<div className="fixed inset-0 flex items-center justify-center z-50">
 			<div className="absolute inset-0 bg-black/40" onClick={() => onOpenChange(false)}></div>
-			<div className="relative bg-elevated p-4 rounded shadow max-w-xl" onClick={(e) => e.stopPropagation()}>
+			<div
+				className="relative bg-elevated p-4 rounded-lg shadow-2xl shadow-black max-w-xl"
+				onClick={(e) => e.stopPropagation()}
+			>
 				{children}
 			</div>
 		</div>,
