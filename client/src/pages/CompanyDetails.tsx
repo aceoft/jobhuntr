@@ -4,6 +4,7 @@ import type { AddOutreachPersonRequest, CompanyDto } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
 import Button from '../components/Button';
 import Input from '../components/Input';
+import Confirm from '../components/Confirm';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -11,6 +12,8 @@ export default function CompanyDetails() {
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [confirmingRemovePersonId, setConfirmingRemovePersonId] = useState<string | null>(null);
+	const [confirmingRemovePerson, setConfirmingRemovePerson] = useState<boolean>(false);
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -76,19 +79,25 @@ export default function CompanyDetails() {
 		});
 	}
 
-	async function removePerson(id: string) {
+	function beginRemovePerson(id: string) {
 		if (!company) {
 			setError('No company, cannot add person.');
 			return;
 		}
 		if (!id) return;
-		await removeCompanyOutreachPerson(company._id, id);
+		setConfirmingRemovePersonId(id);
+		setConfirmingRemovePerson(true);
+	}
+
+	async function removePerson() {
+		if (!confirmingRemovePersonId) return;
+		await removeCompanyOutreachPerson(company!._id, confirmingRemovePersonId);
 		setCompany((current) => {
 			if (!current) return current;
 
 			return {
 				...current,
-				outreach: [...current.outreach.filter((p) => p.id !== id)],
+				outreach: [...current.outreach.filter((p) => p.id !== confirmingRemovePersonId)],
 			};
 		});
 	}
@@ -130,11 +139,18 @@ export default function CompanyDetails() {
 					)}
 					{p.role && <span>({p.role})</span>}
 					{p.email}
-					<Button variant="ghost" className="ml-auto" onClick={() => removePerson(p.id)} aria-label="remove">
+					<Button variant="ghost" className="ml-auto" onClick={() => beginRemovePerson(p.id)} aria-label="remove">
 						🗑️
 					</Button>
 				</div>
 			))}
+
+			<Confirm
+				message="Are you sure you want to remove this outreach person?"
+				open={confirmingRemovePerson}
+				onConfirm={() => removePerson()}
+				close={() => setConfirmingRemovePerson(false)}
+			/>
 
 			<h2>Add New Outreach</h2>
 			<form>
