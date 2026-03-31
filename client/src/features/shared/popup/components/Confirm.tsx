@@ -16,8 +16,8 @@ export default function Confirm({
 	onOpenChange,
 	message,
 	onConfirm,
-	confirmText: confirmText = 'Yes',
-	cancelText: cancelText = 'No',
+	confirmText = 'Yes',
+	cancelText = 'No',
 	children,
 }: ConfirmProps) {
 	function handleClose() {
@@ -34,10 +34,10 @@ export default function Confirm({
 			{message && <h3>{message}</h3>}
 			{children}
 			<div className="flex justify-end mt-10">
-				<Button size="lg" className="mr-2" onClick={() => handleConfirm()}>
+				<Button size="lg" className="mr-2 min-w-90px" onClick={() => handleConfirm()}>
 					{confirmText}
 				</Button>
-				<Button size="lg" onClick={() => handleClose()}>
+				<Button size="lg" variant="ghost" className="min-w-90px" onClick={() => handleClose()}>
 					{cancelText}
 				</Button>
 			</div>
