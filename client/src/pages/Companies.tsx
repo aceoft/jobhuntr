@@ -30,6 +30,21 @@ export default function Companies() {
 				<Link to="/">JobHuntr</Link> » Companies
 			</h1>
 
+			{companies.map((c) => (
+				<div className="card my-2" key={c._id}>
+					<strong>
+						<Link to={`/companies/${c._id}`} className="text-link">
+							{c.name}
+						</Link>
+					</strong>{' '}
+					{/* {c.careersUrl && (
+						<a href={c.careersUrl} target="_blank" rel="noreferrer noopener">
+							careers
+						</a>
+					)} */}
+				</div>
+			))}
+
 			<form>
 				<div className="my-4">
 					<label className="label" htmlFor="company-name">

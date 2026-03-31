@@ -32,6 +32,15 @@ export async function getCompanyById(req: Request, res: Response, next: NextFunc
 	}
 }
 
+export async function deleteCompany(req: Request, res: Response, next: NextFunction) {
+	try {
+		await companyService.deleteCompany(req.params.id);
+		res.status(204).send();
+	} catch (err) {
+		next(err);
+	}
+}
+
 export async function addCompanyOutreachPerson(req: Request, res: Response, next: NextFunction) {
 	try {
 		const person = await companyService.addCompanyOutreachPerson(req.params.companyId, req.body);

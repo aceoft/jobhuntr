@@ -1,7 +1,7 @@
 import React from 'react';
 //import { useEventTracking } from '../../core/ts/analytics';
 
-type ButtonVariant = 'primary' | 'ghost';
+type ButtonVariant = 'primary' | 'ghost' | 'danger';
 type ButtonSize = 'md' | 'lg';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

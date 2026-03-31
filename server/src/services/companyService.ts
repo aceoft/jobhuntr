@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Company, CompanyDocument } from '../models/Company';
+import { Application } from '../models/Application';
 import {
 	AddOutreachPersonRequest,
 	optionalString,
@@ -39,7 +40,16 @@ export async function getCompanyById(
 	return toCompanyDto(company);
 }
 
+export async function companyExists(name: string): Promise<boolean> {
+	const company = await Company.exists({ name }).collation({ locale: 'en', strength: 2 });
+	return Boolean(company);
+}
+
 export async function createCompany(input: CreateCompanyRequest): Promise<CompanyDto> {
+	if (await companyExists(input.name)) {
+		throw new Error('Company with this name already exists.');
+	}
+
 	const company = await Company.create({
 		name: input.name,
 		careersUrl: input.careersUrl,
@@ -47,6 +57,23 @@ export async function createCompany(input: CreateCompanyRequest): Promise<Compan
 	});
 
 	return toCompanyDto(company);
+}
+
+export async function deleteCompany(id: string): Promise<void> {
+	if (!mongoose.Types.ObjectId.isValid(id)) {
+		throw new Error('Invalid company ID.');
+	}
+
+	// Check for applications referencing this company before deletion to maintain referential integrity
+	const applicationsUsingCompany = await Application.exists({ companyId: id });
+	if (applicationsUsingCompany) {
+		throw new Error('Cannot delete company with existing applications.');
+	}
+
+	const company = await Company.findByIdAndDelete(id);
+	if (!company) {
+		throw new Error('Company not found.');
+	}
 }
 
 export async function addCompanyOutreachPerson(

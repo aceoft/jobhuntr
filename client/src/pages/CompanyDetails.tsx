@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { AddOutreachPersonRequest, CompanyDto, OutreachPerson } from 'jobhuntr-shared';
-import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
+import {
+	getCompanyById,
+	addCompanyOutreachPerson,
+	removeCompanyOutreachPerson,
+	deleteCompany,
+} from '../api/companiesApi';
 import { usePopup } from '../features/shared/popup/hooks/usePopup';
 import Button from '../features/shared/components/Button';
 import Input from '../features/shared/components/Input';
@@ -80,7 +85,7 @@ export default function CompanyDetails() {
 		});
 	}
 
-	async function removePerson(person: OutreachPerson) {
+	async function handleRemovePerson(person: OutreachPerson) {
 		if (!person) return;
 		if (!company) {
 			alert({ message: 'No company, cannot remove person.' });
@@ -97,6 +102,15 @@ export default function CompanyDetails() {
 				outreach: [...current.outreach.filter((p) => p.id !== person.id)],
 			};
 		});
+	}
+
+	async function handleDeleteCompany() {
+		if (!company) return;
+		if (!(await confirm({ message: `Are you sure you want to delete ${company.name}? This action cannot be undone.` })))
+			return;
+
+		await deleteCompany(company._id);
+		window.location.href = '/companies';
 	}
 
 	return (
@@ -136,7 +150,7 @@ export default function CompanyDetails() {
 					)}
 					{p.role && <span>({p.role})</span>}
 					{p.email}
-					<Button variant="ghost" className="ml-auto" onClick={() => removePerson(p)} aria-label="remove">
+					<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(p)} aria-label="remove">
 						🗑️
 					</Button>
 				</div>
@@ -162,6 +176,13 @@ export default function CompanyDetails() {
 					<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
 				</form>
 			</Confirm>
+
+			<h2>Danger Zone</h2>
+			<p>
+				<Button variant="danger" onClick={handleDeleteCompany}>
+					Delete Company
+				</Button>
+			</p>
 		</div>
 	);
 }
