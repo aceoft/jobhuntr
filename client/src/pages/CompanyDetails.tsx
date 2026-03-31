@@ -5,6 +5,7 @@ import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson }
 import { usePopup } from '../features/shared/popup/hooks/usePopup';
 import Button from '../features/shared/components/Button';
 import Input from '../features/shared/components/Input';
+import Confirm from '../features/shared/popup/components/Confirm';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -13,6 +14,7 @@ export default function CompanyDetails() {
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -140,17 +142,26 @@ export default function CompanyDetails() {
 				</div>
 			))}
 
-			<h2>Add New Outreach</h2>
-			<form>
-				<Input label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
-				<Input label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
-				<Input label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
-				<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
+			<p>
+				<Button onClick={() => setAddingOutreachPerson(true)}>Add Outreach Person</Button>
+			</p>
 
-				<div className="my-4">
-					<Button onClick={addPerson}>Add Outreach Person</Button>
-				</div>
-			</form>
+			<Confirm
+				open={addingOutreachPerson}
+				onOpenChange={setAddingOutreachPerson}
+				onConfirm={addPerson}
+				confirmText="Add"
+				cancelText="Cancel"
+				size="3xl"
+			>
+				<h2>Add New Outreach</h2>
+				<form>
+					<Input label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
+					<Input label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
+					<Input label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
+					<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
+				</form>
+			</Confirm>
 		</div>
 	);
 }

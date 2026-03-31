@@ -1,10 +1,12 @@
 import { Popup } from './Popup';
 import Button from '../../components/Button';
+import { PopupSize } from '../types';
 
 type ConfirmProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	message?: string;
+	size?: PopupSize;
 	onConfirm: () => void | Promise<void>;
 	confirmText?: string;
 	cancelText?: string;
@@ -15,6 +17,7 @@ export default function Confirm({
 	open,
 	onOpenChange,
 	message,
+	size,
 	onConfirm,
 	confirmText = 'Yes',
 	cancelText = 'No',
@@ -30,7 +33,7 @@ export default function Confirm({
 	}
 
 	return (
-		<Popup open={open} onOpenChange={onOpenChange}>
+		<Popup open={open} onOpenChange={onOpenChange} size={size}>
 			{message && <h3>{message}</h3>}
 			{children}
 			<div className="flex justify-end mt-10">
