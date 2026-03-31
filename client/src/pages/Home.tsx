@@ -3,11 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Home() {
 	return (
 		<>
-			<h1>
-				<Link to="/" className="text-link">
-					JobHuntr
-				</Link>
-			</h1>
+			<h1>JobHuntr</h1>
 			<ul>
 				<li>
 					<Link to="/companies" className="text-link">
