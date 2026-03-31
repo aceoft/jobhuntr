@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import type { AddOutreachPersonRequest, CompanyDto, OutreachPerson } from 'jobhuntr-shared';
 import { getCompanyById, addCompanyOutreachPerson, removeCompanyOutreachPerson } from '../api/companiesApi';
-import { usePopup } from '../features/popup/usePopup';
-import Button from '../components/Button';
-import Input from '../components/Input';
+import { usePopup } from '../features/shared/popup/hooks/usePopup';
+import Button from '../features/shared/components/Button';
+import Input from '../features/shared/components/Input';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();

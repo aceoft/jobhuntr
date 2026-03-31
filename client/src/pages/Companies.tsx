@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { CompanyDto } from 'jobhuntr-shared';
 import { createCompany, getCompanies } from '../api/companiesApi';
-import Button from '../components/Button';
+import Button from '../features/shared/components/Button';
 
 export default function Companies() {
 	const [companies, setCompanies] = useState<CompanyDto[]>([]);
