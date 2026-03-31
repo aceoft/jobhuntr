@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useState } from 'react';
 import Alert from './Alert';
 import Confirm from './Confirm';
+import Prompt from './Prompt';
 
 export type AlertOptions = {
 	message: string;
@@ -11,6 +12,14 @@ export type AlertOptions = {
 export type ConfirmOptions = {
 	message: string;
 	title?: string;
+	confirmText?: string;
+	cancelText?: string;
+};
+
+export type PromptOptions = {
+	message: string;
+	required?: boolean;
+	initialValue?: string;
 	confirmText?: string;
 	cancelText?: string;
 };
@@ -27,11 +36,18 @@ type PopupJob =
 			type: 'confirm';
 			options: ConfirmOptions;
 			resolve: (value: boolean) => void;
+	  }
+	| {
+			id: number;
+			type: 'prompt';
+			options: PromptOptions;
+			resolve: (value: string | undefined) => void;
 	  };
 
 export type PopupContextValue = {
 	alert: (options: AlertOptions) => Promise<void>;
 	confirm: (options: ConfirmOptions) => Promise<boolean>;
+	prompt: (options: PromptOptions) => Promise<string | undefined>;
 };
 
 export const PopupContext = createContext<PopupContextValue | null>(null);
@@ -68,14 +84,27 @@ export function PopupProvider({ children }: { children: React.ReactNode }) {
 		});
 	}
 
-	function resolveCurrent(value?: boolean) {
+	function prompt(options: PromptOptions) {
+		return new Promise<string | undefined>((resolve) => {
+			setQueue((prev) => [
+				...prev,
+				{
+					id: Date.now(),
+					type: 'prompt',
+					options,
+					resolve,
+				},
+			]);
+		});
+	}
+
+	function removeCurrent() {
 		if (!current) return;
-		current.resolve(value as any);
 		setQueue((prev) => prev.slice(1));
 	}
 
 	return (
-		<PopupContext.Provider value={{ alert, confirm }}>
+		<PopupContext.Provider value={{ alert, confirm, prompt }}>
 			{children}
 
 			{current?.type === 'alert' && (
@@ -83,7 +112,10 @@ export function PopupProvider({ children }: { children: React.ReactNode }) {
 					open={true}
 					message={current.options.message}
 					okText={current.options.okText}
-					onOpenChange={() => resolveCurrent()}
+					onOpenChange={() => {
+						current.resolve();
+						removeCurrent();
+					}}
 				/>
 			)}
 
@@ -93,8 +125,33 @@ export function PopupProvider({ children }: { children: React.ReactNode }) {
 					message={current.options.message}
 					confirmText={current.options.confirmText}
 					cancelText={current.options.cancelText}
-					onConfirm={() => resolveCurrent(true)}
-					onOpenChange={() => resolveCurrent(false)}
+					onConfirm={() => {
+						current.resolve(true);
+						removeCurrent();
+					}}
+					onOpenChange={() => {
+						current.resolve(false);
+						removeCurrent();
+					}}
+				/>
+			)}
+
+			{current?.type === 'prompt' && (
+				<Prompt
+					open={true}
+					message={current.options.message}
+					required={current.options.required}
+					initialValue={current.options.initialValue}
+					confirmText={current.options.confirmText}
+					cancelText={current.options.cancelText}
+					onConfirm={(value) => {
+						current.resolve(value);
+						removeCurrent();
+					}}
+					onOpenChange={() => {
+						current.resolve(undefined);
+						removeCurrent();
+					}}
 				/>
 			)}
 		</PopupContext.Provider>

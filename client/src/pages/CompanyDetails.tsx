@@ -8,7 +8,7 @@ import Input from '../features/shared/components/Input';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
-	const { alert, confirm } = usePopup();
+	const { alert, confirm, prompt } = usePopup();
 
 	const [company, setCompany] = useState<CompanyDto | null>(null);
 	const [loading, setLoading] = useState(true);

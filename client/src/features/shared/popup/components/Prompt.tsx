@@ -53,7 +53,7 @@ export default function Prompt({
 			cancelText={cancelText}
 		>
 			{children}
-			<Input label={message} type="text" value={inputValue} onChange={handleInput} className="w-300px" />
+			<Input label={message} type="text" value={inputValue} onChange={handleInput} className="min-w-300px w-full" />
 			{error && <div className="text-danger mt-1">{error}</div>}
 		</Confirm>
 	);
