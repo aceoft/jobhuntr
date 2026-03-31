@@ -1,6 +1,6 @@
 import { OutreachEvent, OutreachPerson, optionalString } from 'jobhuntr-shared';
 import { InferSchemaType } from 'mongoose';
-import { outreachEventSchema, outreachPersonSchema } from '../models/outreachPersonSchema';
+import { outreachEventSchema, outreachPersonSchema } from './outreachPersonSchema';
 
 type OutreachPersonDb = InferSchemaType<typeof outreachPersonSchema>;
 type OutreachEventDb = InferSchemaType<typeof outreachEventSchema>;

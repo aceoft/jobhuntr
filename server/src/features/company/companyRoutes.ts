@@ -6,7 +6,7 @@ import {
 	addCompanyOutreachPerson,
 	removeCompanyOutreachPerson,
 	deleteCompany,
-} from '../controllers/companyController';
+} from './companyController';
 
 const router = Router();
 

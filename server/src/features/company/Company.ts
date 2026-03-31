@@ -1,5 +1,5 @@
 import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
-import { outreachPersonSchema } from './outreachPersonSchema';
+import { outreachPersonSchema } from '../outreach/outreachPersonSchema';
 
 const companySchema = new Schema(
 	{

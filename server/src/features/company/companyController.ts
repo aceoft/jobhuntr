@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { CreateCompanyRequest } from 'jobhuntr-shared';
-import * as companyService from '../services/companyService';
+import * as companyService from './companyService';
 
 export async function getCompanies(req: Request, res: Response, next: NextFunction) {
 	try {

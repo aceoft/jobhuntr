@@ -22,7 +22,7 @@ ol:not(.plain) {
 	}
 }
 
-$cellPadding: 10px;
+$cellPadding: 1rem;
 
 table {
 	width: 100%;
@@ -53,10 +53,10 @@ table {
 			}
 
 			&:nth-child(odd) > td {
-				background-color: color.scale($colorSurface, $alpha: -80%);
+				background-color: color.scale($colorSurface, $alpha: -50%);
 			}
 			&:nth-child(even) > td {
-				background-color: color.scale($colorSurface, $alpha: -50%);
+				background-color: $colorSurface;
 			}
 		}
 	}

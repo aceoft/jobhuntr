@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { Company, CompanyDocument } from '../models/Company';
-import { Application } from '../models/Application';
+import { Company, CompanyDocument } from './Company';
+import { Application } from '../application/Application';
 import {
 	AddOutreachPersonRequest,
 	optionalString,
@@ -9,7 +9,7 @@ import {
 	type CompanyDto,
 	type CreateCompanyRequest,
 } from 'jobhuntr-shared';
-import { toOutreachPersonDto } from './outreachMapper';
+import { toOutreachPersonDto } from '../outreach/outreachMapper';
 import { randomUUID } from 'crypto';
 
 function toCompanyDto(doc: CompanyDocument): CompanyDto {

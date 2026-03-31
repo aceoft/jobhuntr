@@ -1,6 +1,6 @@
 import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 import { ApplicationStatusValues, ApplicationLevelValues, FirstResponseTypeValues } from 'jobhuntr-shared';
-import { outreachPersonSchema } from './outreachPersonSchema';
+import { outreachPersonSchema } from '../outreach/outreachPersonSchema';
 
 const applicationStatusChangeSchema = new Schema(
 	{
