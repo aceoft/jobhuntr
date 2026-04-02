@@ -1,3 +1,14 @@
 .card {
 	backdrop-filter: blur(2px);
 }
+
+.outreach-event-message {
+	width: 70%;
+
+	&.incoming {
+		margin-right: auto;
+	}
+	&.outgoing {
+		margin-left: auto;
+	}
+}

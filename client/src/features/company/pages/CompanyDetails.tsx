@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { AddOutreachPersonRequest, CompanyDto, OutreachPerson } from 'jobhuntr-shared';
+import type { AddOutreachPersonRequest, CompanyDto, OutreachEvent, OutreachPerson } from 'jobhuntr-shared';
 import {
 	getCompanyById,
 	addCompanyOutreachPerson,
@@ -24,7 +24,9 @@ export default function CompanyDetails() {
 	const [error, setError] = useState('');
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
 	const [viewingOutreachPerson, setViewingOutreachPerson] = useState(false);
-	const [selectedOutreachPerson, setSelectedOutreachPerson] = useState<OutreachPerson | null>(null);
+	const [selectedOutreachPersonId, setSelectedOutreachPersonId] = useState<string | null>(null);
+
+	const selectedOutreachPerson = company?.outreach.find((p) => p.id === selectedOutreachPersonId) ?? null;
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -109,9 +111,30 @@ export default function CompanyDetails() {
 		});
 	}
 
-	function handleViewPerson(person: OutreachPerson) {
-		setSelectedOutreachPerson(person);
+	function handleSelectPerson(person: OutreachPerson) {
+		setSelectedOutreachPersonId(person.id);
 		setViewingOutreachPerson(true);
+	}
+
+	async function handleEventAdded(event: OutreachEvent) {
+		if (!selectedOutreachPerson) return;
+		if (!company) return;
+
+		setCompany((current) => {
+			if (!current) return current;
+
+			return {
+				...current,
+				outreach: current.outreach.map((person) => {
+					if (person.id !== selectedOutreachPersonId) return person;
+
+					return {
+						...person,
+						events: [...person.events, event],
+					};
+				}),
+			};
+		});
 	}
 
 	async function handleDeleteCompany() {
@@ -152,7 +175,7 @@ export default function CompanyDetails() {
 			{company.outreach.map((p) => (
 				<div className="card flex items-center gap-2 my-2" key={p.id}>
 					{p.name}
-					<Button variant="ghost" onClick={() => handleViewPerson(p)} aria-label="view">
+					<Button variant="ghost" onClick={() => handleSelectPerson(p)} aria-label="view">
 						View
 					</Button>
 					{p.url && (
@@ -197,7 +220,9 @@ export default function CompanyDetails() {
 			</p>
 
 			<Alert open={viewingOutreachPerson} onOpenChange={setViewingOutreachPerson} okText="Done" size="2xl">
-				{selectedOutreachPerson && <OutreachPersonDetails person={selectedOutreachPerson} />}
+				{selectedOutreachPerson && (
+					<OutreachPersonDetails person={selectedOutreachPerson} eventAdded={handleEventAdded} />
+				)}
 			</Alert>
 		</div>
 	);
