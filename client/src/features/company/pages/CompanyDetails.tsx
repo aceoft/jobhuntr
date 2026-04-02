@@ -11,6 +11,9 @@ import { usePopup } from '../../popup/hooks/usePopup';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import Confirm from '../../popup/components/Confirm';
+import { Popup } from '../../popup/components/Popup';
+import Alert from '../../popup/components/Alert';
+import OutreachPersonDetails from '../../outreach/components/OutreachPersonDetails';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
@@ -20,6 +23,8 @@ export default function CompanyDetails() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
+	const [viewingOutreachPerson, setViewingOutreachPerson] = useState(false);
+	const [selectedOutreachPerson, setSelectedOutreachPerson] = useState<OutreachPerson | null>(null);
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -104,6 +109,11 @@ export default function CompanyDetails() {
 		});
 	}
 
+	function handleViewPerson(person: OutreachPerson) {
+		setSelectedOutreachPerson(person);
+		setViewingOutreachPerson(true);
+	}
+
 	async function handleDeleteCompany() {
 		if (!company) return;
 		if (!(await confirm({ message: `Are you sure you want to delete ${company.name}? This action cannot be undone.` })))
@@ -140,13 +150,15 @@ export default function CompanyDetails() {
 			<h2>Outreach</h2>
 
 			{company.outreach.map((p) => (
-				<div className="card flex items-center gap-2" key={p.id}>
-					{p.url ? (
+				<div className="card flex items-center gap-2 my-2" key={p.id}>
+					{p.name}
+					<Button variant="ghost" onClick={() => handleViewPerson(p)} aria-label="view">
+						View
+					</Button>
+					{p.url && (
 						<a href={p.url} className="text-link">
 							{p.name}
 						</a>
-					) : (
-						p.name
 					)}
 					{p.role && <span>({p.role})</span>}
 					{p.email}
@@ -183,6 +195,10 @@ export default function CompanyDetails() {
 					Delete Company
 				</Button>
 			</p>
+
+			<Alert open={viewingOutreachPerson} onOpenChange={setViewingOutreachPerson} okText="Done" size="2xl">
+				{selectedOutreachPerson && <OutreachPersonDetails person={selectedOutreachPerson} />}
+			</Alert>
 		</div>
 	);
 }

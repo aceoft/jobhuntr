@@ -21,7 +21,7 @@ export function Popup({ open, onOpenChange, size = 'xl', children }: BasePopupPr
 		full: 'w-full',
 	};
 
-	const allClasses = 'relative bg-elevated p-4 px-8 rounded-lg shadow-2xl shadow-black mx-4 ' + sizeClasses[size];
+	const allClasses = 'relative bg-elevated p-4 px-8 pb-8 rounded-lg shadow-2xl shadow-black mx-4 ' + sizeClasses[size];
 
 	return createPortal(
 		<div className="fixed inset-0 flex items-center justify-center z-50">

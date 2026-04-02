@@ -1,13 +1,13 @@
 import { useId } from 'react';
 
-type InputProps = {
+type TextAreaProps = {
 	label?: React.ReactNode;
 	className?: string;
 	onChange: (value: string) => void;
 	fluid?: boolean;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>;
+} & Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'onChange'>;
 
-export default function Input({ label, id, className, value, onChange, fluid, ...rest }: InputProps) {
+export default function TextArea({ label, id, className, value, onChange, fluid, ...rest }: TextAreaProps) {
 	const combinedClassName = ['input', className].filter(Boolean).join(' ');
 	const inputId = id ?? useId();
 
@@ -18,7 +18,7 @@ export default function Input({ label, id, className, value, onChange, fluid, ..
 					{label}
 				</label>
 			)}
-			<input
+			<textarea
 				id={inputId}
 				className={combinedClassName}
 				value={value}

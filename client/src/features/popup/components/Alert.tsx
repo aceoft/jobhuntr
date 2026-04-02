@@ -19,7 +19,7 @@ export default function Alert({ onOpenChange, message, onOk, okText = 'OK', chil
 			{message && <h3>{message}</h3>}
 			{children}
 			<div className="flex justify-end mt-10">
-				<Button size="lg" className="mr-2" onClick={() => handleOk()}>
+				<Button size="lg" onClick={() => handleOk()}>
 					{okText}
 				</Button>
 			</div>
