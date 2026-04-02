@@ -1,4 +1,3 @@
-// usePopup.ts
 import { useContext } from 'react';
 import { PopupContext } from '../PopupProvider';
 

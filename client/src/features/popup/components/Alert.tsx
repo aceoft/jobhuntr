@@ -1,33 +1,21 @@
-import { Popup } from './Popup';
+import React from 'react';
+import { Popup, BasePopupProps } from './Popup';
 import Button from '../../../shared/components/Button';
-import { PopupSize } from '../types';
 
-type AlertProps = {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	message?: string;
-	size?: PopupSize;
+type AlertProps = BasePopupProps & {
+	message?: React.ReactNode;
 	onOk?: () => void | Promise<void>;
 	okText?: string;
-	children?: React.ReactNode;
 };
 
-export default function Alert({
-	open,
-	onOpenChange,
-	message,
-	size,
-	onOk,
-	okText: okText = 'OK',
-	children,
-}: AlertProps) {
+export default function Alert({ onOpenChange, message, onOk, okText = 'OK', children, ...rest }: AlertProps) {
 	async function handleOk() {
 		await onOk?.();
 		onOpenChange(false);
 	}
 
 	return (
-		<Popup open={open} onOpenChange={onOpenChange} size={size}>
+		<Popup onOpenChange={onOpenChange} {...rest}>
 			{message && <h3>{message}</h3>}
 			{children}
 			<div className="flex justify-end mt-10">

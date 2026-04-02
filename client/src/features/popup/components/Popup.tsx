@@ -1,14 +1,14 @@
 import { createPortal } from 'react-dom';
 import { PopupSize } from '../types';
 
-type PopupProps = {
+export type BasePopupProps = {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	size?: PopupSize;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 };
 
-export function Popup({ open, onOpenChange, size = 'xl', children }: PopupProps) {
+export function Popup({ open, onOpenChange, size = 'xl', children }: BasePopupProps) {
 	if (!open) return null;
 
 	const sizeClasses = {

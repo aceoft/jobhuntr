@@ -32,7 +32,7 @@ export default function Companies() {
 				<Link to="/">JobHuntr</Link> » Companies
 			</h1>
 
-			{companies.length && (
+			{companies.length > 0 && (
 				<table className="table">
 					<thead>
 						<tr>

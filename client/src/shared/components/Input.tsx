@@ -1,7 +1,7 @@
 import { useId } from 'react';
 
 type InputProps = {
-	label: string;
+	label: React.ReactNode;
 	className?: string;
 	onChange: (value: string) => void;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>;

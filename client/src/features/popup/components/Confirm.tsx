@@ -1,27 +1,22 @@
-import { Popup } from './Popup';
+import React from 'react';
+import { Popup, BasePopupProps } from './Popup';
 import Button from '../../../shared/components/Button';
-import { PopupSize } from '../types';
 
-type ConfirmProps = {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	message?: string;
-	size?: PopupSize;
+export type ConfirmProps = BasePopupProps & {
+	message?: React.ReactNode;
 	onConfirm: () => void | Promise<void>;
 	confirmText?: string;
 	cancelText?: string;
-	children?: React.ReactNode;
 };
 
 export default function Confirm({
-	open,
 	onOpenChange,
 	message,
-	size,
 	onConfirm,
 	confirmText = 'Yes',
 	cancelText = 'No',
 	children,
+	...rest
 }: ConfirmProps) {
 	function handleClose() {
 		onOpenChange(false);
@@ -33,7 +28,7 @@ export default function Confirm({
 	}
 
 	return (
-		<Popup open={open} onOpenChange={onOpenChange} size={size}>
+		<Popup onOpenChange={onOpenChange} {...rest}>
 			{message && <h3>{message}</h3>}
 			{children}
 			<div className="flex justify-end mt-10">

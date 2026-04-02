@@ -1,29 +1,21 @@
 import { useState } from 'react';
-import Confirm from './Confirm';
+import Confirm, { ConfirmProps } from './Confirm';
 import Input from '../../../shared/components/Input';
 
-type PromptProps = {
-	open: boolean;
-	onOpenChange: (open: boolean) => void;
-	message: string;
+type PromptProps = Omit<ConfirmProps, 'onConfirm'> & {
 	required?: boolean;
-	initialValue?: string;
 	onConfirm: (value: string) => void | Promise<void>;
-	confirmText?: string;
-	cancelText?: string;
-	children?: React.ReactNode;
+	initialValue?: string;
 };
 
 export default function Prompt({
-	open,
 	onOpenChange,
 	message,
 	initialValue = '',
 	required = true,
 	onConfirm,
-	confirmText = 'OK',
-	cancelText = 'Cancel',
 	children,
+	...rest
 }: PromptProps) {
 	const [inputValue, setInputValue] = useState(initialValue);
 	const [error, setError] = useState('');
@@ -45,13 +37,7 @@ export default function Prompt({
 	}
 
 	return (
-		<Confirm
-			open={open}
-			onOpenChange={onOpenChange}
-			onConfirm={handleConfirm}
-			confirmText={confirmText}
-			cancelText={cancelText}
-		>
+		<Confirm onOpenChange={onOpenChange} onConfirm={handleConfirm} {...rest}>
 			{children}
 			<Input label={message} type="text" value={inputValue} onChange={handleInput} className="min-w-300px w-full" />
 			{error && <div className="text-danger mt-1">{error}</div>}
