@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Companies from './pages/Companies';
-import CompanyDetails from './pages/CompanyDetails';
+import Companies from './features/company/pages/Companies';
+import CompanyDetails from './features/company/pages/CompanyDetails';
 import Home from './pages/Home';
-import { PopupProvider } from './features/shared/popup/components/PopupProvider';
+import { PopupProvider } from './features/popup/PopupProvider';
 
 export default function App() {
 	return (

@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
-import Alert from './Alert';
-import Confirm from './Confirm';
-import Prompt from './Prompt';
+import Alert from './components/Alert';
+import Confirm from './components/Confirm';
+import Prompt from './components/Prompt';
 
 export type AlertOptions = {
 	message: string;

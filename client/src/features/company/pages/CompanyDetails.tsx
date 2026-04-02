@@ -7,10 +7,10 @@ import {
 	removeCompanyOutreachPerson,
 	deleteCompany,
 } from '../api/companiesApi';
-import { usePopup } from '../features/shared/popup/hooks/usePopup';
-import Button from '../features/shared/components/Button';
-import Input from '../features/shared/components/Input';
-import Confirm from '../features/shared/popup/components/Confirm';
+import { usePopup } from '../../popup/hooks/usePopup';
+import Button from '../../../shared/components/Button';
+import Input from '../../../shared/components/Input';
+import Confirm from '../../popup/components/Confirm';
 
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();

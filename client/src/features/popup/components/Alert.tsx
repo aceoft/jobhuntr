@@ -1,5 +1,5 @@
 import { Popup } from './Popup';
-import Button from '../../components/Button';
+import Button from '../../../shared/components/Button';
 import { PopupSize } from '../types';
 
 type AlertProps = {

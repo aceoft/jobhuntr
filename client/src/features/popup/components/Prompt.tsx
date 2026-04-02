@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Confirm from './Confirm';
-import Input from '../../components/Input';
+import Input from '../../../shared/components/Input';
 
 type PromptProps = {
 	open: boolean;

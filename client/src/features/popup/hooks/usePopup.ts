@@ -1,6 +1,6 @@
 // usePopup.ts
 import { useContext } from 'react';
-import { PopupContext } from '../components/PopupProvider';
+import { PopupContext } from '../PopupProvider';
 
 export function usePopup() {
 	const ctx = useContext(PopupContext);
