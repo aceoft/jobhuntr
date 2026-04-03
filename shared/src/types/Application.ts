@@ -52,7 +52,7 @@ export type ApplicationDto = {
 	rejectedAt?: Date;
 	closedAt?: Date;
 
-	statusHistory: ApplicationStatusChange[];
+	//statusHistory: ApplicationStatusChange[];
 	outreach: OutreachPerson[];
 	notes: Note[];
 
