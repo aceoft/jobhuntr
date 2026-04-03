@@ -1,5 +1,11 @@
 import axios from 'axios';
-import type { AddOutreachPersonRequest, CompanyDto, CreateCompanyRequest, OutreachPerson } from 'jobhuntr-shared';
+import type {
+	AddOutreachPersonRequest,
+	CompanyDto,
+	CreateCompanyRequest,
+	OutreachEvent,
+	OutreachPerson,
+} from 'jobhuntr-shared';
 
 export function getCompanies(): Promise<CompanyDto[]> {
 	return axios.get<CompanyDto[]>('/api/companies').then((res) => res.data);
@@ -23,4 +29,14 @@ export function addCompanyOutreachPerson(companyId: string, dto: AddOutreachPers
 
 export function removeCompanyOutreachPerson(companyId: string, personId: string) {
 	return axios.delete(`/api/companies/${companyId}/outreach/${personId}`);
+}
+
+export function addCompanyOutreachPersonEvent(companyId: string, personId: string, event: OutreachEvent) {
+	return axios
+		.post<OutreachEvent>(`/api/companies/${companyId}/outreach/${personId}/events`, event)
+		.then((res) => res.data);
+}
+
+export function removeCompanyOutreachPersonEvent(companyId: string, personId: string, eventId: string) {
+	return axios.delete(`/api/companies/${companyId}/outreach/${personId}/events/${eventId}`);
 }

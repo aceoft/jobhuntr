@@ -61,3 +61,36 @@ export async function removeCompanyOutreachPerson(req: Request, res: Response, n
 		next(err);
 	}
 }
+
+export async function addCompanyOutreachPersonEvent(req: Request, res: Response, next: NextFunction) {
+	try {
+		const company = await companyService.getCompanyById(req.params.companyId);
+		if (!company) {
+			return res.status(404).json({ message: 'Company not found' });
+		}
+		const event = await companyService.addCompanyOutreachPersonEvent(
+			req.params.companyId,
+			req.params.personId,
+			req.body,
+		);
+		if (!event) {
+			return res.status(404).json({ message: 'Person not found' });
+		}
+		res.json(event);
+	} catch (err) {
+		next(err);
+	}
+}
+
+export async function removeCompanyOutreachPersonEvent(req: Request, res: Response, next: NextFunction) {
+	try {
+		await companyService.removeCompanyOutreachPersonEvent(
+			req.params.companyId,
+			req.params.personId,
+			req.params.eventId,
+		);
+		res.status(204).send();
+	} catch (err) {
+		next(err);
+	}
+}

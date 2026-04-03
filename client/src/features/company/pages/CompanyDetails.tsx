@@ -6,12 +6,13 @@ import {
 	addCompanyOutreachPerson,
 	removeCompanyOutreachPerson,
 	deleteCompany,
+	addCompanyOutreachPersonEvent,
+	removeCompanyOutreachPersonEvent,
 } from '../api/companiesApi';
 import { usePopup } from '../../popup/hooks/usePopup';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
 import Confirm from '../../popup/components/Confirm';
-import { Popup } from '../../popup/components/Popup';
 import Alert from '../../popup/components/Alert';
 import OutreachPersonDetails from '../../outreach/components/OutreachPersonDetails';
 
@@ -117,8 +118,10 @@ export default function CompanyDetails() {
 	}
 
 	async function handleEventAdded(event: OutreachEvent) {
-		if (!selectedOutreachPerson) return;
 		if (!company) return;
+		if (!selectedOutreachPersonId) return;
+
+		const added = await addCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, event);
 
 		setCompany((current) => {
 			if (!current) return current;
@@ -130,7 +133,31 @@ export default function CompanyDetails() {
 
 					return {
 						...person,
-						events: [...person.events, event],
+						events: [...person.events, added],
+					};
+				}),
+			};
+		});
+	}
+
+	async function handleEventRemoved(id: string) {
+		if (!company) return;
+		if (!selectedOutreachPersonId) return;
+		if (!id.trim()) return;
+
+		await removeCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, id);
+
+		setCompany((current) => {
+			if (!current) return current;
+
+			return {
+				...current,
+				outreach: current.outreach.map((person) => {
+					if (person.id !== selectedOutreachPersonId) return person;
+
+					return {
+						...person,
+						events: [...person.events.filter((e) => e.id !== id)],
 					};
 				}),
 			};
@@ -175,16 +202,10 @@ export default function CompanyDetails() {
 			{company.outreach.map((p) => (
 				<div className="card flex items-center gap-2 my-2" key={p.id}>
 					{p.name}
+					{p.role && <span>({p.role})</span>}
 					<Button variant="ghost" onClick={() => handleSelectPerson(p)} aria-label="view">
 						View
 					</Button>
-					{p.url && (
-						<a href={p.url} className="text-link">
-							{p.name}
-						</a>
-					)}
-					{p.role && <span>({p.role})</span>}
-					{p.email}
 					<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(p)} aria-label="remove">
 						🗑️
 					</Button>
@@ -221,7 +242,11 @@ export default function CompanyDetails() {
 
 			<Alert open={viewingOutreachPerson} onOpenChange={setViewingOutreachPerson} okText="Done" size="2xl">
 				{selectedOutreachPerson && (
-					<OutreachPersonDetails person={selectedOutreachPerson} eventAdded={handleEventAdded} />
+					<OutreachPersonDetails
+						person={selectedOutreachPerson}
+						eventAdded={handleEventAdded}
+						eventRemoved={handleEventRemoved}
+					/>
 				)}
 			</Alert>
 		</div>

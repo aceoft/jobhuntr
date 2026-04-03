@@ -147,3 +147,26 @@ export async function removeCompanyOutreachPerson(companyId: string, personId: s
 		throw new Error('Outreach person not found.');
 	}
 }
+
+export async function removeCompanyOutreachPersonEvent(
+	companyId: string,
+	personId: string,
+	eventId: string,
+): Promise<undefined> {
+	const result = await Company.updateOne(
+		{ _id: companyId, 'outreach.id': personId },
+		{
+			$pull: {
+				'outreach.$.events': { id: eventId },
+			},
+		},
+	);
+
+	if (result.matchedCount === 0) {
+		throw new Error('Company or outreach person not found.');
+	}
+
+	if (result.modifiedCount === 0) {
+		throw new Error('Event not found.');
+	}
+}

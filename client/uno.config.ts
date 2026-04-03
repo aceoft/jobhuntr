@@ -26,6 +26,7 @@ export default defineConfig({
 		'btn-primary',
 		'btn-ghost',
 		'btn-danger',
+		'btn-plain',
 		'btn-lg',
 		'text-link',
 	],
@@ -57,6 +58,7 @@ export default defineConfig({
 		'btn-ghost': 'btn bg-white/3 border border-border hover:bg-white/8 text-text',
 		'btn-primary': 'btn bg-accent text-black hover:brightness-110',
 		'btn-danger': 'btn bg-danger text-white hover:brightness-110',
+		'btn-plain': 'bg-transparent text-text cursor-pointer p-0 m-0',
 		'btn-lg': 'btn text-lg',
 
 		// ---- icons ----
