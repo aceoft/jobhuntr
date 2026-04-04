@@ -22,6 +22,10 @@ function toCompanyDto(doc: CompanyDocument): CompanyDto {
 	};
 }
 
+function normalizeCompanyName(name: string): string {
+	return name.trim().toLowerCase();
+}
+
 export async function getAllCompanies(): Promise<CompanyDto[]> {
 	const companies = await Company.find({ active: true }).sort({ name: 1 });
 
@@ -40,13 +44,16 @@ export async function getCompanyById(
 	return toCompanyDto(company);
 }
 
-export async function companyExists(name: string): Promise<boolean> {
-	const company = await Company.exists({ name }).collation({ locale: 'en', strength: 2 });
-	return Boolean(company);
+export async function companyNameExists(name: string): Promise<boolean> {
+	return !!(await Company.exists({ name }).collation({ locale: 'en', strength: 2 }));
+}
+
+export async function companyIdExists(id: string): Promise<boolean> {
+	return !!(await Company.exists({ _id: new mongoose.Types.ObjectId(id) }));
 }
 
 export async function createCompany(input: CreateCompanyRequest): Promise<CompanyDto> {
-	if (await companyExists(input.name)) {
+	if (await companyNameExists(input.name)) {
 		throw new Error('Company with this name already exists.');
 	}
 

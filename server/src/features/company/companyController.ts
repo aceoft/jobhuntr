@@ -20,7 +20,7 @@ export async function createCompany(req: Request<{}, {}, CreateCompanyRequest>, 
 	}
 }
 
-export async function getCompanyById(req: Request, res: Response, next: NextFunction) {
+export async function getCompanyById(req: Request<{ id: string }>, res: Response, next: NextFunction) {
 	try {
 		const company = await companyService.getCompanyById(req.params.id, { includeInactive: false });
 		if (!company) {
@@ -32,7 +32,7 @@ export async function getCompanyById(req: Request, res: Response, next: NextFunc
 	}
 }
 
-export async function deleteCompany(req: Request, res: Response, next: NextFunction) {
+export async function deleteCompany(req: Request<{ id: string }>, res: Response, next: NextFunction) {
 	try {
 		await companyService.deleteCompany(req.params.id);
 		res.status(204).send();
@@ -41,7 +41,7 @@ export async function deleteCompany(req: Request, res: Response, next: NextFunct
 	}
 }
 
-export async function addCompanyOutreachPerson(req: Request, res: Response, next: NextFunction) {
+export async function addCompanyOutreachPerson(req: Request<{ companyId: string }>, res: Response, next: NextFunction) {
 	try {
 		const person = await companyService.addCompanyOutreachPerson(req.params.companyId, req.body);
 		if (!person) {
@@ -53,7 +53,11 @@ export async function addCompanyOutreachPerson(req: Request, res: Response, next
 	}
 }
 
-export async function removeCompanyOutreachPerson(req: Request, res: Response, next: NextFunction) {
+export async function removeCompanyOutreachPerson(
+	req: Request<{ companyId: string; personId: string }>,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		await companyService.removeCompanyOutreachPerson(req.params.companyId, req.params.personId);
 		res.status(204).send();
@@ -62,7 +66,11 @@ export async function removeCompanyOutreachPerson(req: Request, res: Response, n
 	}
 }
 
-export async function addCompanyOutreachPersonEvent(req: Request, res: Response, next: NextFunction) {
+export async function addCompanyOutreachPersonEvent(
+	req: Request<{ companyId: string; personId: string }>,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		const company = await companyService.getCompanyById(req.params.companyId);
 		if (!company) {
@@ -82,7 +90,11 @@ export async function addCompanyOutreachPersonEvent(req: Request, res: Response,
 	}
 }
 
-export async function removeCompanyOutreachPersonEvent(req: Request, res: Response, next: NextFunction) {
+export async function removeCompanyOutreachPersonEvent(
+	req: Request<{ companyId: string; personId: string; eventId: string }>,
+	res: Response,
+	next: NextFunction,
+) {
 	try {
 		await companyService.removeCompanyOutreachPersonEvent(
 			req.params.companyId,

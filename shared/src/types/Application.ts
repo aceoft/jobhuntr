@@ -61,7 +61,6 @@ export type ApplicationDto = {
 };
 
 export type CreateApplicationRequest = {
-	companyId: string;
 	roleTitle: string;
 	postingUrl?: string;
 	postingSource?: string;
@@ -69,9 +68,7 @@ export type CreateApplicationRequest = {
 	salaryRangeLow?: number;
 	salaryRangeHigh?: number;
 	resumeUsed?: string;
-
 	status: ApplicationStatus;
-
 	postedAt?: Date;
 	postingAgeDaysAtApply?: number;
 };

@@ -1,7 +1,8 @@
-import { ApplicationDto, optionalString } from 'jobhuntr-shared';
+import { ApplicationDto, CreateApplicationRequest, optionalString } from 'jobhuntr-shared';
 import mongoose from 'mongoose';
 import { Application, ApplicationDocument } from './Application';
 import { toOutreachPersonDto } from '../outreach/outreachMapper';
+import { getCompanyById } from '../company/companyService';
 
 function toApplicationDto(doc: ApplicationDocument): ApplicationDto {
 	return {
@@ -33,4 +34,45 @@ export async function getApplicationById(id: string): Promise<ApplicationDto | n
 	if (!application) return null;
 
 	return toApplicationDto(application);
+}
+
+export async function createApplication(companyId: string, input: CreateApplicationRequest): Promise<ApplicationDto> {
+	const company = await getCompanyById(companyId);
+	if (!company) {
+		throw new Error('Company not found.');
+	}
+
+	return Application.create({
+		companyId: company._id,
+		roleTitle: input.roleTitle,
+		companyNameSnapshot: company.name,
+		postingUrl: input.postingUrl,
+		postingSource: input.postingSource,
+		level: input.level,
+		salaryRangeLow: input.salaryRangeLow,
+		salaryRangeHigh: input.salaryRangeHigh,
+		resumeUsed: input.resumeUsed,
+		status: input.status,
+		postedAt: input.postedAt,
+		appliedAt: new Date(),
+	}).then(toApplicationDto);
+}
+
+export async function deleteApplication(companyId: string, id: string): Promise<void> {
+	if (!mongoose.Types.ObjectId.isValid(companyId)) {
+		throw new Error('Invalid company ID.');
+	}
+	if (!mongoose.Types.ObjectId.isValid(id)) {
+		throw new Error('Invalid application ID.');
+	}
+
+	const company = await getCompanyById(companyId);
+	if (!company) {
+		throw new Error('Company not found.');
+	}
+
+	const application = await Application.findByIdAndDelete(id);
+	if (!application) {
+		throw new Error('Application not found.');
+	}
 }

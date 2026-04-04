@@ -4,6 +4,7 @@ import { outreachPersonSchema } from '../outreach/outreachPersonSchema';
 const companySchema = new Schema(
 	{
 		name: { type: String, required: true },
+		normalizedName: { type: String, required: true, unique: true },
 		careersUrl: String,
 		outreach: {
 			type: [outreachPersonSchema],
