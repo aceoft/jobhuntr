@@ -27,6 +27,14 @@ function toApplicationDto(doc: ApplicationDocument): ApplicationDto {
 	};
 }
 
+export async function getApplicationsForCompanyById(companyId: string): Promise<ApplicationDto[] | null> {
+	if (!mongoose.Types.ObjectId.isValid(companyId)) return null;
+
+	return await Application.find({ companyId: new mongoose.Types.ObjectId(companyId) }).then((applications) =>
+		applications.map(toApplicationDto),
+	);
+}
+
 export async function getApplicationById(id: string): Promise<ApplicationDto | null> {
 	if (!mongoose.Types.ObjectId.isValid(id)) return null;
 

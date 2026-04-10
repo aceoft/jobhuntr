@@ -1,29 +1,27 @@
 import { Router } from 'express';
-import {
-	getCompanies,
-	createCompany,
-	getCompanyById,
-	addCompanyOutreachPerson,
-	removeCompanyOutreachPerson,
-	deleteCompany,
-	addCompanyOutreachPersonEvent,
-	removeCompanyOutreachPersonEvent,
-} from './companyController';
+import * as companyController from './companyController';
+import * as applicationController from '../application/applicationController';
 
 const router = Router();
 
 // Company routes
-router.get('/', getCompanies);
-router.post('/', createCompany);
-router.get('/:id', getCompanyById);
-router.delete('/:id', deleteCompany);
+router.get('/', companyController.getCompanies);
+router.post('/', companyController.createCompany);
+router.get('/:id', companyController.getCompanyById);
+router.delete('/:id', companyController.deleteCompany);
 
 // Outreach routes
-router.post('/:companyId/outreach', addCompanyOutreachPerson);
-router.delete('/:companyId/outreach/:personId', removeCompanyOutreachPerson);
+router.post('/:companyId/outreach', companyController.addCompanyOutreachPerson);
+router.delete('/:companyId/outreach/:personId', companyController.removeCompanyOutreachPerson);
 
 // Outreach event routes
-router.post('/:companyId/outreach/:personId/events', addCompanyOutreachPersonEvent);
-router.delete('/:companyId/outreach/:personId/events/:eventId', removeCompanyOutreachPersonEvent);
+router.post('/:companyId/outreach/:personId/events', companyController.addCompanyOutreachPersonEvent);
+router.delete('/:companyId/outreach/:personId/events/:eventId', companyController.removeCompanyOutreachPersonEvent);
+
+// Applications
+router.get('/:companyId/applications', applicationController.getApplicationsForCompanyById);
+router.get('/:companyId/applications/:applicationId', applicationController.getApplicationById);
+router.post('/:companyId/applications', applicationController.createApplication);
+router.delete('/:companyId/applications/:applicationId', applicationController.deleteApplication);
 
 export default router;

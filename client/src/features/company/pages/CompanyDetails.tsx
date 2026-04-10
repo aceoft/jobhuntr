@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import type { AddOutreachPersonRequest, CompanyDto, OutreachEvent, OutreachPerson } from 'jobhuntr-shared';
-import {
-	getCompanyById,
-	addCompanyOutreachPerson,
-	removeCompanyOutreachPerson,
-	deleteCompany,
-	addCompanyOutreachPersonEvent,
-	removeCompanyOutreachPersonEvent,
-} from '../api/companiesApi';
+import type {
+	AddOutreachPersonRequest,
+	ApplicationDto,
+	CompanyDto,
+	OutreachEvent,
+	OutreachPerson,
+} from 'jobhuntr-shared';
+import * as companiesApi from '../api/companiesApi';
+import * as applicationsApi from '../../application/api/applicationsApi';
 import { usePopup } from '../../popup/hooks/usePopup';
 import Button from '../../../shared/components/Button';
 import Input from '../../../shared/components/Input';
@@ -21,6 +21,7 @@ export default function CompanyDetails() {
 	const { alert, confirm, prompt } = usePopup();
 
 	const [company, setCompany] = useState<CompanyDto | null>(null);
+	const [applications, setApplications] = useState<ApplicationDto[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
@@ -49,7 +50,7 @@ export default function CompanyDetails() {
 			}
 
 			try {
-				const result = await getCompanyById(id);
+				const result = await companiesApi.getCompanyById(id);
 				setCompany(result);
 			} catch (err) {
 				console.error(err);
@@ -60,6 +61,28 @@ export default function CompanyDetails() {
 		}
 
 		loadCompany();
+	}, [id]);
+
+	useEffect(() => {
+		async function loadApplications() {
+			if (!id) {
+				setError('Missing company id.');
+				setLoading(false);
+				return;
+			}
+
+			try {
+				const result = await applicationsApi.getApplicationsForCompanyId(id);
+				setApplications(result);
+			} catch (err) {
+				console.error(err);
+				setError('Failed to load applications.');
+			} finally {
+				setLoading(false);
+			}
+		}
+
+		loadApplications();
 	}, [id]);
 
 	if (loading) {
@@ -80,7 +103,7 @@ export default function CompanyDetails() {
 			return;
 		}
 
-		const created = await addCompanyOutreachPerson(company._id, newPerson);
+		const created = await companiesApi.addCompanyOutreachPerson(company._id, newPerson);
 		setNewPerson(emptyPerson);
 
 		setCompany((current) => {
@@ -101,7 +124,7 @@ export default function CompanyDetails() {
 		}
 		if (!(await confirm({ message: `Are you sure you want to remove ${person.name}?` }))) return;
 
-		await removeCompanyOutreachPerson(company!._id, person.id);
+		await companiesApi.removeCompanyOutreachPerson(company!._id, person.id);
 		setCompany((current) => {
 			if (!current) return current;
 
@@ -121,7 +144,7 @@ export default function CompanyDetails() {
 		if (!company) return;
 		if (!selectedOutreachPersonId) return;
 
-		const added = await addCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, event);
+		const added = await companiesApi.addCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, event);
 
 		setCompany((current) => {
 			if (!current) return current;
@@ -145,7 +168,7 @@ export default function CompanyDetails() {
 		if (!selectedOutreachPersonId) return;
 		if (!id.trim()) return;
 
-		await removeCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, id);
+		await companiesApi.removeCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, id);
 
 		setCompany((current) => {
 			if (!current) return current;
@@ -169,7 +192,7 @@ export default function CompanyDetails() {
 		if (!(await confirm({ message: `Are you sure you want to delete ${company.name}? This action cannot be undone.` })))
 			return;
 
-		await deleteCompany(company._id);
+		await companiesApi.deleteCompany(company._id);
 		window.location.href = '/companies';
 	}
 
@@ -196,6 +219,41 @@ export default function CompanyDetails() {
 					)}
 				</div>
 			</div>
+
+			<h2>Applications</h2>
+
+			{applications.map((a) => (
+				<div className="card flex items-center gap-2 my-2" key={a._id}>
+					{a.roleTitle}
+					{/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
+						View
+					</Button>
+					<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(a)} aria-label="remove">
+						🗑️
+					</Button> */}
+				</div>
+			))}
+
+			<p>
+				<Button onClick={() => setAddingOutreachPerson(true)}>Add Application</Button>
+			</p>
+
+			<Confirm
+				open={addingOutreachPerson}
+				onOpenChange={setAddingOutreachPerson}
+				onConfirm={addPerson}
+				confirmText="Add"
+				cancelText="Cancel"
+				size="3xl"
+			>
+				<h2>Add New Outreach</h2>
+				<form>
+					<Input label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
+					<Input label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
+					<Input label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
+					<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
+				</form>
+			</Confirm>
 
 			<h2>Outreach</h2>
 

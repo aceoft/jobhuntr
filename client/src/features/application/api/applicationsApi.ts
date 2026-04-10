@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApplicationDto, CreateApplicationRequest } from 'jobhuntr-shared';
 
-export function getApplications(companyId: string): Promise<ApplicationDto[]> {
+export function getApplicationsForCompanyId(companyId: string): Promise<ApplicationDto[]> {
 	return axios.get<ApplicationDto[]>(`/api/companies/${companyId}/applications`).then((res) => res.data);
 }
 
