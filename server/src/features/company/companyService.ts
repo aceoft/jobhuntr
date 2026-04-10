@@ -45,7 +45,7 @@ export async function getCompanyById(
 }
 
 export async function companyNameExists(name: string): Promise<boolean> {
-	return !!(await Company.exists({ name }).collation({ locale: 'en', strength: 2 }));
+	return !!(await Company.exists({ normalizedName: normalizeCompanyName(name) }));
 }
 
 export async function companyIdExists(id: string): Promise<boolean> {
@@ -59,6 +59,7 @@ export async function createCompany(input: CreateCompanyRequest): Promise<Compan
 
 	const company = await Company.create({
 		name: input.name,
+		normalizedName: normalizeCompanyName(input.name),
 		careersUrl: input.careersUrl,
 		active: input.active ?? true,
 	});
