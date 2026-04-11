@@ -4,6 +4,7 @@ import type {
 	AddOutreachPersonRequest,
 	ApplicationDto,
 	CompanyDto,
+	CreateApplicationRequest,
 	OutreachEvent,
 	OutreachPerson,
 } from 'jobhuntr-shared';
@@ -24,6 +25,7 @@ export default function CompanyDetails() {
 	const [applications, setApplications] = useState<ApplicationDto[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState('');
+	const [addingApplication, setAddingApplication] = useState(false);
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
 	const [viewingOutreachPerson, setViewingOutreachPerson] = useState(false);
 	const [selectedOutreachPersonId, setSelectedOutreachPersonId] = useState<string | null>(null);
@@ -39,6 +41,23 @@ export default function CompanyDetails() {
 	const [newPerson, setNewPerson] = useState(emptyPerson);
 	function updateNewPerson<K extends keyof typeof newPerson>(key: K, value: (typeof newPerson)[K]) {
 		setNewPerson((p) => ({ ...p, [key]: value }));
+	}
+
+	const emptyApplication: CreateApplicationRequest = {
+		roleTitle: '',
+		postingUrl: '',
+		level: 'staff',
+		status: 'applied',
+		postedAt: new Date(),
+		postingAgeDaysAtApply: 0,
+		postingSource: '',
+		resumeUsed: '',
+		salaryRangeLow: 0,
+		salaryRangeHigh: 0,
+	};
+	const [newApplication, setNewApplication] = useState(emptyApplication);
+	function updateNewApplication<K extends keyof typeof emptyApplication>(key: K, value: (typeof newApplication)[K]) {
+		setNewApplication((p) => ({ ...p, [key]: value }));
 	}
 
 	useEffect(() => {
@@ -60,10 +79,6 @@ export default function CompanyDetails() {
 			}
 		}
 
-		loadCompany();
-	}, [id]);
-
-	useEffect(() => {
 		async function loadApplications() {
 			if (!id) {
 				setError('Missing company id.');
@@ -82,6 +97,7 @@ export default function CompanyDetails() {
 			}
 		}
 
+		loadCompany();
 		loadApplications();
 	}, [id]);
 
@@ -95,6 +111,37 @@ export default function CompanyDetails() {
 
 	if (!company) {
 		return <div>Company not found.</div>;
+	}
+
+	async function addApplication() {
+		if (!company) {
+			alert({ message: 'No company, cannot add application.' });
+			return;
+		}
+
+		const created = await applicationsApi.createApplication(company._id, newApplication);
+		setNewApplication(emptyApplication);
+
+		setApplications((current) => {
+			if (!current) return current;
+
+			return [...current, created];
+		});
+	}
+
+	async function handleRemoveApplication(application: ApplicationDto) {
+		if (!application) return;
+		if (!company) {
+			alert({ message: 'No company, cannot remove application.' });
+			return;
+		}
+		if (!(await confirm({ message: `Are you sure you want to remove ${application.roleTitle}?` }))) return;
+
+		await applicationsApi.deleteApplication(company!._id, application._id);
+		setApplications((current) => {
+			if (!current) return current;
+			return current.filter((a) => a._id !== application._id);
+		});
 	}
 
 	async function addPerson() {
@@ -225,33 +272,36 @@ export default function CompanyDetails() {
 			{applications.map((a) => (
 				<div className="card flex items-center gap-2 my-2" key={a._id}>
 					{a.roleTitle}
-					{/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
+					{
+						/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
 						View
-					</Button>
-					<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(a)} aria-label="remove">
-						🗑️
-					</Button> */}
+					</Button>*/
+						<Button variant="ghost" className="ml-auto" onClick={() => handleRemoveApplication(a)} aria-label="remove">
+							🗑️
+						</Button>
+					}
 				</div>
 			))}
 
 			<p>
-				<Button onClick={() => setAddingOutreachPerson(true)}>Add Application</Button>
+				<Button onClick={() => setAddingApplication(true)}>Add Application</Button>
 			</p>
 
 			<Confirm
-				open={addingOutreachPerson}
-				onOpenChange={setAddingOutreachPerson}
-				onConfirm={addPerson}
+				open={addingApplication}
+				onOpenChange={setAddingApplication}
+				onConfirm={addApplication}
 				confirmText="Add"
 				cancelText="Cancel"
 				size="3xl"
 			>
-				<h2>Add New Outreach</h2>
+				<h2>Add New Application</h2>
 				<form>
-					<Input label="Name" value={newPerson.name} onChange={(v) => updateNewPerson('name', v)} />
-					<Input label="Role" value={newPerson.role} onChange={(v) => updateNewPerson('role', v)} />
-					<Input label="Url" type="url" value={newPerson.url} onChange={(v) => updateNewPerson('url', v)} />
-					<Input label="Email" type="email" value={newPerson.email} onChange={(v) => updateNewPerson('email', v)} />
+					<Input
+						label="Role Title"
+						value={newApplication.roleTitle}
+						onChange={(v) => updateNewApplication('roleTitle', v)}
+					/>
 				</form>
 			</Confirm>
 
