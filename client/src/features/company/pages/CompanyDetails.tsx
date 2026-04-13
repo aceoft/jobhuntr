@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
 	AddOutreachPersonRequest,
 	ApplicationDto,
@@ -21,16 +22,10 @@ export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
 	const { alert, confirm, prompt } = usePopup();
 
-	const [company, setCompany] = useState<CompanyDto | null>(null);
-	const [applications, setApplications] = useState<ApplicationDto[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState('');
 	const [addingApplication, setAddingApplication] = useState(false);
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
 	const [viewingOutreachPerson, setViewingOutreachPerson] = useState(false);
 	const [selectedOutreachPersonId, setSelectedOutreachPersonId] = useState<string | null>(null);
-
-	const selectedOutreachPerson = company?.outreach.find((p) => p.id === selectedOutreachPersonId) ?? null;
 
 	const emptyPerson: AddOutreachPersonRequest = {
 		name: '',
@@ -60,58 +55,19 @@ export default function CompanyDetails() {
 		setNewApplication((p) => ({ ...p, [key]: value }));
 	}
 
-	useEffect(() => {
-		async function loadCompany() {
-			if (!id) {
-				setError('Missing company id.');
-				setLoading(false);
-				return;
-			}
+	const queryClient = useQueryClient();
 
-			try {
-				const result = await companiesApi.getCompanyById(id);
-				setCompany(result);
-			} catch (err) {
-				console.error(err);
-				setError('Failed to load company.');
-			} finally {
-				setLoading(false);
-			}
-		}
+	const { isPending: companyPending, data: company } = useQuery({
+		queryKey: ['company', id],
+		queryFn: ({ queryKey }) => companiesApi.getCompanyById(queryKey[1]!),
+	});
 
-		async function loadApplications() {
-			if (!id) {
-				setError('Missing company id.');
-				setLoading(false);
-				return;
-			}
+	const { isPending: applicationsPending, data: applications } = useQuery({
+		queryKey: ['company', 'applications', id],
+		queryFn: ({ queryKey }) => applicationsApi.getApplicationsForCompanyId(queryKey[2]!),
+	});
 
-			try {
-				const result = await applicationsApi.getApplicationsForCompanyId(id);
-				setApplications(result);
-			} catch (err) {
-				console.error(err);
-				setError('Failed to load applications.');
-			} finally {
-				setLoading(false);
-			}
-		}
-
-		loadCompany();
-		loadApplications();
-	}, [id]);
-
-	if (loading) {
-		return <div>Loading company...</div>;
-	}
-
-	if (error) {
-		return <div>{error}</div>;
-	}
-
-	if (!company) {
-		return <div>Company not found.</div>;
-	}
+	const selectedOutreachPerson = company?.outreach.find((p) => p.id === selectedOutreachPersonId) ?? null;
 
 	async function addApplication() {
 		if (!company) {
@@ -122,11 +78,11 @@ export default function CompanyDetails() {
 		const created = await applicationsApi.createApplication(company._id, newApplication);
 		setNewApplication(emptyApplication);
 
-		setApplications((current) => {
-			if (!current) return current;
+		// setApplications((current) => {
+		// 	if (!current) return current;
 
-			return [...current, created];
-		});
+		// 	return [...current, created];
+		// });
 	}
 
 	async function handleRemoveApplication(application: ApplicationDto) {
@@ -138,10 +94,10 @@ export default function CompanyDetails() {
 		if (!(await confirm({ message: `Are you sure you want to remove ${application.roleTitle}?` }))) return;
 
 		await applicationsApi.deleteApplication(company!._id, application._id);
-		setApplications((current) => {
-			if (!current) return current;
-			return current.filter((a) => a._id !== application._id);
-		});
+		// setApplications((current) => {
+		// 	if (!current) return current;
+		// 	return current.filter((a) => a._id !== application._id);
+		// });
 	}
 
 	async function addPerson() {
@@ -153,14 +109,14 @@ export default function CompanyDetails() {
 		const created = await companiesApi.addCompanyOutreachPerson(company._id, newPerson);
 		setNewPerson(emptyPerson);
 
-		setCompany((current) => {
-			if (!current) return current;
+		// setCompany((current) => {
+		// 	if (!current) return current;
 
-			return {
-				...current,
-				outreach: [...current.outreach, created],
-			};
-		});
+		// 	return {
+		// 		...current,
+		// 		outreach: [...current.outreach, created],
+		// 	};
+		// });
 	}
 
 	async function handleRemovePerson(person: OutreachPerson) {
@@ -172,14 +128,14 @@ export default function CompanyDetails() {
 		if (!(await confirm({ message: `Are you sure you want to remove ${person.name}?` }))) return;
 
 		await companiesApi.removeCompanyOutreachPerson(company!._id, person.id);
-		setCompany((current) => {
-			if (!current) return current;
+		// setCompany((current) => {
+		// 	if (!current) return current;
 
-			return {
-				...current,
-				outreach: [...current.outreach.filter((p) => p.id !== person.id)],
-			};
-		});
+		// 	return {
+		// 		...current,
+		// 		outreach: [...current.outreach.filter((p) => p.id !== person.id)],
+		// 	};
+		// });
 	}
 
 	function handleSelectPerson(person: OutreachPerson) {
@@ -193,21 +149,21 @@ export default function CompanyDetails() {
 
 		const added = await companiesApi.addCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, event);
 
-		setCompany((current) => {
-			if (!current) return current;
+		// setCompany((current) => {
+		// 	if (!current) return current;
 
-			return {
-				...current,
-				outreach: current.outreach.map((person) => {
-					if (person.id !== selectedOutreachPersonId) return person;
+		// 	return {
+		// 		...current,
+		// 		outreach: current.outreach.map((person) => {
+		// 			if (person.id !== selectedOutreachPersonId) return person;
 
-					return {
-						...person,
-						events: [...person.events, added],
-					};
-				}),
-			};
-		});
+		// 			return {
+		// 				...person,
+		// 				events: [...person.events, added],
+		// 			};
+		// 		}),
+		// 	};
+		// });
 	}
 
 	async function handleEventRemoved(id: string) {
@@ -217,21 +173,21 @@ export default function CompanyDetails() {
 
 		await companiesApi.removeCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, id);
 
-		setCompany((current) => {
-			if (!current) return current;
+		// setCompany((current) => {
+		// 	if (!current) return current;
 
-			return {
-				...current,
-				outreach: current.outreach.map((person) => {
-					if (person.id !== selectedOutreachPersonId) return person;
+		// 	return {
+		// 		...current,
+		// 		outreach: current.outreach.map((person) => {
+		// 			if (person.id !== selectedOutreachPersonId) return person;
 
-					return {
-						...person,
-						events: [...person.events.filter((e) => e.id !== id)],
-					};
-				}),
-			};
-		});
+		// 			return {
+		// 				...person,
+		// 				events: [...person.events.filter((e) => e.id !== id)],
+		// 			};
+		// 		}),
+		// 	};
+		// });
 	}
 
 	async function handleDeleteCompany() {
@@ -246,42 +202,57 @@ export default function CompanyDetails() {
 	return (
 		<div>
 			<h1>
-				<Link to="/">JobHuntr</Link> » <Link to="/companies">Companies</Link> » {company.name}
+				<Link to="/">JobHuntr</Link> » <Link to="/companies">Companies</Link> » {company?.name}
 			</h1>
 
-			<div className="my-4">
-				<label className="label">Company Name</label>
-				<div className="input">{company.name}</div>
-			</div>
+			{companyPending ? (
+				<p>Loading...</p>
+			) : (
+				company && (
+					<>
+						<div className="my-4">
+							<label className="label">Company Name</label>
+							<div className="input">{company.name}</div>
+						</div>
 
-			<div className="my-4">
-				<label className="label">Careers Url</label>
-				<div className="input">
-					{company.careersUrl ? (
-						<a href={company.careersUrl} target="_blank" rel="noreferrer noopener">
-							{company.careersUrl}
-						</a>
-					) : (
-						<span>No careers URL</span>
-					)}
-				</div>
-			</div>
+						<div className="my-4">
+							<label className="label">Careers Url</label>
+							<div className="input">
+								{company.careersUrl ? (
+									<a href={company.careersUrl} target="_blank" rel="noreferrer noopener">
+										{company.careersUrl}
+									</a>
+								) : (
+									<span>No careers URL</span>
+								)}
+							</div>
+						</div>
+					</>
+				)
+			)}
 
 			<h2>Applications</h2>
 
-			{applications.map((a) => (
-				<div className="card flex items-center gap-2 my-2" key={a._id}>
-					{a.roleTitle}
-					{
-						/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
-						View
-					</Button>*/
-						<Button variant="ghost" className="ml-auto" onClick={() => handleRemoveApplication(a)} aria-label="remove">
-							🗑️
-						</Button>
-					}
-				</div>
-			))}
+			{applicationsPending && <p>Loading applications...</p>}
+			{applications &&
+				applications.map((a) => (
+					<div className="card flex items-center gap-2 my-2" key={a._id}>
+						{a.roleTitle}
+						{
+							/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
+				View
+			</Button>*/
+							<Button
+								variant="ghost"
+								className="ml-auto"
+								onClick={() => handleRemoveApplication(a)}
+								aria-label="remove"
+							>
+								🗑️
+							</Button>
+						}
+					</div>
+				))}
 
 			<p>
 				<Button onClick={() => setAddingApplication(true)}>Add Application</Button>
@@ -307,18 +278,21 @@ export default function CompanyDetails() {
 
 			<h2>Outreach</h2>
 
-			{company.outreach.map((p) => (
-				<div className="card flex items-center gap-2 my-2" key={p.id}>
-					{p.name}
-					{p.role && <span>({p.role})</span>}
-					<Button variant="ghost" onClick={() => handleSelectPerson(p)} aria-label="view">
-						View
-					</Button>
-					<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(p)} aria-label="remove">
-						🗑️
-					</Button>
-				</div>
-			))}
+			{companyPending && <p>Loading...</p>}
+
+			{company &&
+				company.outreach.map((p) => (
+					<div className="card flex items-center gap-2 my-2" key={p.id}>
+						{p.name}
+						{p.role && <span>({p.role})</span>}
+						<Button variant="ghost" onClick={() => handleSelectPerson(p)} aria-label="view">
+							View
+						</Button>
+						<Button variant="ghost" className="ml-auto" onClick={() => handleRemovePerson(p)} aria-label="remove">
+							🗑️
+						</Button>
+					</div>
+				))}
 
 			<p>
 				<Button onClick={() => setAddingOutreachPerson(true)}>Add Outreach Person</Button>

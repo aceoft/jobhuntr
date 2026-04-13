@@ -1,29 +1,41 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { CompanyDto } from 'jobhuntr-shared';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createCompany, getCompanies } from '../api/companiesApi';
 import Confirm from '../../popup/components/Confirm';
 import Button from '../../../shared/components/Button';
 
+const companiesQueryKey = ['companies'];
+
 export default function Companies() {
-	const [companies, setCompanies] = useState<CompanyDto[]>([]);
 	const [name, setName] = useState('');
 	const [careersUrl, setCareersUrl] = useState('');
 	const [addingCompany, setAddingCompany] = useState(false);
+	const queryClient = useQueryClient();
 
-	useEffect(() => {
-		getCompanies().then(setCompanies);
-	}, []);
+	const {
+		isPending,
+		error,
+		data: companies,
+	} = useQuery({
+		queryKey: companiesQueryKey,
+		queryFn: getCompanies,
+	});
 
-	async function addCompany() {
-		const created = await createCompany({
+	const { mutate: mutateCreateCompany } = useMutation({
+		mutationFn: createCompany,
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companiesQueryKey });
+			setName('');
+			setCareersUrl('');
+		},
+	});
+
+	function addCompany() {
+		mutateCreateCompany({
 			name,
 			careersUrl: careersUrl || undefined,
 		});
-
-		setCompanies((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
-		setName('');
-		setCareersUrl('');
 	}
 
 	return (
@@ -32,7 +44,10 @@ export default function Companies() {
 				<Link to="/">JobHuntr</Link> » Companies
 			</h1>
 
-			{companies.length > 0 && (
+			{isPending && <p>Loading companies...</p>}
+			{error && <p>Unable to load companies.</p>}
+
+			{companies && companies.length ? (
 				<table className="table">
 					<thead>
 						<tr>
@@ -59,6 +74,8 @@ export default function Companies() {
 						))}
 					</tbody>
 				</table>
+			) : (
+				<p>No companies yet.</p>
 			)}
 
 			<p>
