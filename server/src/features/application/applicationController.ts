@@ -15,9 +15,9 @@ export async function getApplicationsForCompanyById(
 	}
 }
 
-export async function getApplicationById(req: Request<{ id: string }>, res: Response, next: NextFunction) {
+export async function getApplicationById(req: Request<{ applicationId: string }>, res: Response, next: NextFunction) {
 	try {
-		const application = await applicationService.getApplicationById(req.params.id);
+		const application = await applicationService.getApplicationById(req.params.applicationId);
 		if (!application) {
 			res.status(404).json({ error: 'Application not found.' });
 			return;

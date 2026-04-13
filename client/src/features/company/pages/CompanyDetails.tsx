@@ -233,11 +233,10 @@ export default function CompanyDetails() {
 			{applications &&
 				applications.map((a) => (
 					<div className="card flex items-center gap-2 my-2" key={a._id}>
-						{a.roleTitle}
+						<Link to={`/companies/${company?._id}/applications/${a._id}`} className="text-link">
+							{a.roleTitle}
+						</Link>
 						{
-							/* <Button variant="ghost" onClick={() => handleSelectPerson(a)} aria-label="view">
-				View
-			</Button>*/
 							<Button
 								variant="ghost"
 								className="ml-auto"

@@ -18,7 +18,7 @@ app.use((req, _res, next) => {
 	next();
 });
 
-app.use((req, res, next) => setTimeout(next, 1000)); // Simulate network latency
+app.use((req, res, next) => setTimeout(next, 500)); // Simulate network latency
 
 app.use('/api/companies', companyRoutes);
 
