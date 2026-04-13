@@ -9,7 +9,7 @@ export async function getApplicationsForCompanyById(
 ) {
 	try {
 		const applications = await applicationService.getApplicationsForCompanyById(req.params.companyId);
-		res.status(201).json(applications);
+		res.status(200).json(applications);
 	} catch (err) {
 		next(err);
 	}
@@ -42,12 +42,12 @@ export async function createApplication(
 }
 
 export async function deleteApplication(
-	req: Request<{ companyId: string; id: string }>,
+	req: Request<{ companyId: string; applicationId: string }>,
 	res: Response,
 	next: NextFunction,
 ) {
 	try {
-		await applicationService.deleteApplication(req.params.companyId, req.params.id);
+		await applicationService.deleteApplication(req.params.companyId, req.params.applicationId);
 		res.status(204).send();
 	} catch (err) {
 		next(err);

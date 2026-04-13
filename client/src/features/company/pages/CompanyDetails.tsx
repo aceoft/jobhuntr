@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
 	AddOutreachPersonRequest,
 	ApplicationDto,
-	CompanyDto,
 	CreateApplicationRequest,
 	OutreachEvent,
 	OutreachPerson,
@@ -18,71 +17,122 @@ import Confirm from '../../popup/components/Confirm';
 import Alert from '../../popup/components/Alert';
 import OutreachPersonDetails from '../../outreach/components/OutreachPersonDetails';
 
+const emptyPerson: AddOutreachPersonRequest = {
+	name: '',
+	email: '',
+	role: '',
+	url: '',
+};
+
+const emptyApplication: CreateApplicationRequest = {
+	roleTitle: '',
+	postingUrl: '',
+	level: 'staff',
+	status: 'applied',
+	postedAt: new Date(), // overridden server-side
+	postingAgeDaysAtApply: 0,
+	postingSource: '',
+	resumeUsed: '',
+	salaryRangeLow: 0,
+	salaryRangeHigh: 0,
+};
+
 export default function CompanyDetails() {
 	const { id } = useParams<{ id: string }>();
-	const { alert, confirm, prompt } = usePopup();
+	const { alert, confirm } = usePopup();
 
 	const [addingApplication, setAddingApplication] = useState(false);
 	const [addingOutreachPerson, setAddingOutreachPerson] = useState(false);
 	const [viewingOutreachPerson, setViewingOutreachPerson] = useState(false);
 	const [selectedOutreachPersonId, setSelectedOutreachPersonId] = useState<string | null>(null);
 
-	const emptyPerson: AddOutreachPersonRequest = {
-		name: '',
-		email: '',
-		role: '',
-		url: '',
-	};
 	const [newPerson, setNewPerson] = useState(emptyPerson);
 	function updateNewPerson<K extends keyof typeof newPerson>(key: K, value: (typeof newPerson)[K]) {
 		setNewPerson((p) => ({ ...p, [key]: value }));
 	}
 
-	const emptyApplication: CreateApplicationRequest = {
-		roleTitle: '',
-		postingUrl: '',
-		level: 'staff',
-		status: 'applied',
-		postedAt: new Date(),
-		postingAgeDaysAtApply: 0,
-		postingSource: '',
-		resumeUsed: '',
-		salaryRangeLow: 0,
-		salaryRangeHigh: 0,
-	};
 	const [newApplication, setNewApplication] = useState(emptyApplication);
-	function updateNewApplication<K extends keyof typeof emptyApplication>(key: K, value: (typeof newApplication)[K]) {
+	function updateNewApplication<K extends keyof typeof newApplication>(key: K, value: (typeof newApplication)[K]) {
 		setNewApplication((p) => ({ ...p, [key]: value }));
 	}
 
 	const queryClient = useQueryClient();
 
+	const companyQueryKey = ['companies', id] as const;
+	const companyApplicationsQueryKey = ['companies', id, 'applications'] as const;
+
+	// Company query
 	const { isPending: companyPending, data: company } = useQuery({
-		queryKey: ['company', id],
-		queryFn: ({ queryKey }) => companiesApi.getCompanyById(queryKey[1]!),
+		queryKey: companyQueryKey,
+		queryFn: () => companiesApi.getCompanyById(id!),
+		enabled: Boolean(id),
 	});
 
+	// Applications query
 	const { isPending: applicationsPending, data: applications } = useQuery({
-		queryKey: ['company', 'applications', id],
-		queryFn: ({ queryKey }) => applicationsApi.getApplicationsForCompanyId(queryKey[2]!),
+		queryKey: companyApplicationsQueryKey,
+		queryFn: () => applicationsApi.getApplicationsForCompanyId(id!),
+		enabled: Boolean(id),
+	});
+
+	// Outreach person mutations
+	const { mutate: mutateAddOutreachPerson } = useMutation({
+		mutationFn: (data: AddOutreachPersonRequest) => companiesApi.addCompanyOutreachPerson(id!, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companyQueryKey });
+			setNewPerson(emptyPerson);
+		},
+	});
+	const { mutate: mutateRemoveOutreachPerson } = useMutation({
+		mutationFn: (personId: string) => companiesApi.removeCompanyOutreachPerson(id!, personId),
+		onSuccess: (_data, personId) => {
+			queryClient.invalidateQueries({ queryKey: companyQueryKey });
+			if (selectedOutreachPersonId === personId) {
+				setSelectedOutreachPersonId(null);
+			}
+		},
+	});
+
+	// Outreach person event mutations
+	const { mutate: mutateAddOutreachPersonEvent } = useMutation({
+		mutationFn: (data: OutreachEvent) =>
+			companiesApi.addCompanyOutreachPersonEvent(id!, selectedOutreachPersonId!, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companyQueryKey });
+		},
+	});
+	const { mutate: mutateRemoveOutreachPersonEvent } = useMutation({
+		mutationFn: ({ personId, eventId }: { personId: string; eventId: string }) =>
+			companiesApi.removeCompanyOutreachPersonEvent(id!, personId, eventId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companyQueryKey });
+		},
+	});
+
+	// Application mutations
+	const { mutate: mutateAddApplication } = useMutation({
+		mutationFn: (data: CreateApplicationRequest) => applicationsApi.createApplication(id!, data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companyApplicationsQueryKey });
+			setNewApplication(emptyApplication);
+		},
+	});
+	const { mutate: mutateDeleteApplication } = useMutation({
+		mutationFn: (applicationId: string) => applicationsApi.deleteApplication(id!, applicationId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: companyApplicationsQueryKey });
+		},
 	});
 
 	const selectedOutreachPerson = company?.outreach.find((p) => p.id === selectedOutreachPersonId) ?? null;
 
-	async function addApplication() {
+	function addApplication() {
 		if (!company) {
 			alert({ message: 'No company, cannot add application.' });
 			return;
 		}
 
-		const created = await applicationsApi.createApplication(company._id, newApplication);
-		setNewApplication(emptyApplication);
-
-		// setApplications((current) => {
-		// 	if (!current) return current;
-
-		// 	return [...current, created];
-		// });
+		mutateAddApplication(newApplication);
 	}
 
 	async function handleRemoveApplication(application: ApplicationDto) {
@@ -93,30 +143,16 @@ export default function CompanyDetails() {
 		}
 		if (!(await confirm({ message: `Are you sure you want to remove ${application.roleTitle}?` }))) return;
 
-		await applicationsApi.deleteApplication(company!._id, application._id);
-		// setApplications((current) => {
-		// 	if (!current) return current;
-		// 	return current.filter((a) => a._id !== application._id);
-		// });
+		mutateDeleteApplication(application._id);
 	}
 
-	async function addPerson() {
+	function addPerson() {
 		if (!company) {
 			alert({ message: 'No company, cannot add person.' });
 			return;
 		}
 
-		const created = await companiesApi.addCompanyOutreachPerson(company._id, newPerson);
-		setNewPerson(emptyPerson);
-
-		// setCompany((current) => {
-		// 	if (!current) return current;
-
-		// 	return {
-		// 		...current,
-		// 		outreach: [...current.outreach, created],
-		// 	};
-		// });
+		mutateAddOutreachPerson(newPerson);
 	}
 
 	async function handleRemovePerson(person: OutreachPerson) {
@@ -127,15 +163,7 @@ export default function CompanyDetails() {
 		}
 		if (!(await confirm({ message: `Are you sure you want to remove ${person.name}?` }))) return;
 
-		await companiesApi.removeCompanyOutreachPerson(company!._id, person.id);
-		// setCompany((current) => {
-		// 	if (!current) return current;
-
-		// 	return {
-		// 		...current,
-		// 		outreach: [...current.outreach.filter((p) => p.id !== person.id)],
-		// 	};
-		// });
+		mutateRemoveOutreachPerson(person.id);
 	}
 
 	function handleSelectPerson(person: OutreachPerson) {
@@ -147,23 +175,7 @@ export default function CompanyDetails() {
 		if (!company) return;
 		if (!selectedOutreachPersonId) return;
 
-		const added = await companiesApi.addCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, event);
-
-		// setCompany((current) => {
-		// 	if (!current) return current;
-
-		// 	return {
-		// 		...current,
-		// 		outreach: current.outreach.map((person) => {
-		// 			if (person.id !== selectedOutreachPersonId) return person;
-
-		// 			return {
-		// 				...person,
-		// 				events: [...person.events, added],
-		// 			};
-		// 		}),
-		// 	};
-		// });
+		mutateAddOutreachPersonEvent(event);
 	}
 
 	async function handleEventRemoved(id: string) {
@@ -171,23 +183,7 @@ export default function CompanyDetails() {
 		if (!selectedOutreachPersonId) return;
 		if (!id.trim()) return;
 
-		await companiesApi.removeCompanyOutreachPersonEvent(company._id, selectedOutreachPersonId, id);
-
-		// setCompany((current) => {
-		// 	if (!current) return current;
-
-		// 	return {
-		// 		...current,
-		// 		outreach: current.outreach.map((person) => {
-		// 			if (person.id !== selectedOutreachPersonId) return person;
-
-		// 			return {
-		// 				...person,
-		// 				events: [...person.events.filter((e) => e.id !== id)],
-		// 			};
-		// 		}),
-		// 	};
-		// });
+		mutateRemoveOutreachPersonEvent({ personId: selectedOutreachPersonId, eventId: id });
 	}
 
 	async function handleDeleteCompany() {
