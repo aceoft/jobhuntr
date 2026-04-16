@@ -2,7 +2,11 @@
 
 A lightweight job application tracker built with the MERN stack.
 
-JobHuntr helps you track companies, applications, and your progress through the hiring pipeline without the overhead of spreadsheets or bloated tools.
+JobHuntr helps you track companies, applications, and your progress through the hiring pipeline.
+
+I'm building this project to get exposure to a new stack to broaden my skillset as I search for a new job.
+
+It is a work in progress, so there will be unfinished sections and rough edges.
 
 ---
 
