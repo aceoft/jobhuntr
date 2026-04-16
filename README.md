@@ -9,6 +9,9 @@ JobHuntr helps you track companies, applications, and your progress through the 
 ## ✨ Features (Current)
 
 - View list of companies
+- Create new companies
+- Create outreach on companies
+- Create outreach events/thread
 - Backend API with Express + MongoDB
 - Clean service-layer architecture
 - React frontend with Vite
@@ -17,7 +20,6 @@ JobHuntr helps you track companies, applications, and your progress through the 
 
 ## 🚧 Planned Features
 
-- Create and manage companies
 - Track job applications per company
 - Application status pipeline (Saved → Applied → Interview → Offer → Rejected)
 - Interview tracking
@@ -51,6 +53,7 @@ JobHuntr helps you track companies, applications, and your progress through the 
 jobhuntr/
 ├── client/        # React frontend
 ├── server/        # Express + Mongo backend
+├── shared/        # Common typescript that can be shared between client/server
 ```
 
 ---
@@ -60,28 +63,36 @@ jobhuntr/
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-username/jobhuntr.git
+git clone https://github.com/aceoft/jobhuntr.git
 cd jobhuntr
 ```
 
 ---
 
-### 2. Setup the server
+### 2. Install npm packages
 
 ```bash
-cd server
 npm install
 ```
 
 Create a `.env` file:
 
 ```env
-MONGO_URI=mongodb://localhost:27017/jobhuntr
+MONGO_URI_DEV=mongodb://localhost:27017/jobhuntr
+MONGO_URI_PROD=mongodb://localhost:27017/jobhuntr
+```
+
+Build the shared package:
+
+```bash
+cd shared
+npm run build
 ```
 
 Start the server:
 
 ```bash
+cd server
 npm run dev
 ```
 
@@ -97,7 +108,6 @@ http://localhost:3000
 
 ```bash
 cd client
-npm install
 npm run dev
 ```
 
@@ -105,29 +115,6 @@ Client runs on:
 
 ```
 http://localhost:5173 (or next available port)
-```
-
----
-
-## 🔌 API
-
-### Get Companies
-
-```
-GET /api/companies
-```
-
-Returns:
-
-```json
-[
-	{
-		"_id": "...",
-		"name": "Microsoft",
-		"careersUrl": "https://careers.microsoft.com/...",
-		"active": true
-	}
-]
 ```
 
 ---
@@ -151,11 +138,8 @@ Returns:
 
 ## 📌 Roadmap
 
-- [ ] Add create/edit company UI
-- [ ] Add applications collection + API
 - [ ] Dashboard view
 - [ ] Search and filtering
-- [ ] Authentication (optional)
 
 ---
 
